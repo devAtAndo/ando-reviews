@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ando — Reviews</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f8f7f3;
+  color: #1a1a1a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  background: white;
+  border-top: 3px solid #C91006;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+.header-left { display: flex; align-items: baseline; gap: 10px; }
+.header-brand { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.header-divider { width: 1px; height: 14px; background: #e0ddd6; }
+.header-title { font-size: 13px; color: #999; font-weight: 400; }
+.header-meta { font-size: 12px; color: #bbb; }
+
+/* Layout */
+.container { max-width: 1440px; margin: 0 auto; padding: 28px 40px; }
+
+/* KPI */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.kpi {
+  background: white;
+  border-radius: 10px;
+  padding: 18px 22px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04);
+}
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #bbb;
+  margin-bottom: 8px;
+}
+.kpi-value { font-size: 34px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; color: #1a1a1a; }
+.kpi-sub { font-size: 12px; color: #bbb; margin-top: 5px; }
+.kpi.primary { border-left: 3px solid #C91006; padding-left: 19px; }
+.kpi.primary .kpi-value { font-size: 44px; color: #C91006; letter-spacing: -2px; }
+.rating-mini { margin-top: 5px; font-size: 17px; letter-spacing: 2px; }
+
+/* Filters */
+.filters {
+  background: white;
+  border-radius: 10px;
+  padding: 12px 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.fg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 20px;
+  margin-right: 20px;
+  border-right: 1px solid #ede9e3;
+}
+.fg:last-of-type { border-right: none; }
+.fl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #ccc;
+  white-space: nowrap;
+}
+.fs {
+  padding: 6px 24px 6px 10px;
+  border: 1px solid #eae7e0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23bbb'/%3E%3C/svg%3E") no-repeat right 9px center;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 120px;
+}
+.fs:focus { border-color: #C91006; }
+.filter-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.result-count { font-size: 12px; color: #bbb; }
+.btn-reset {
+  font-size: 12px; color: #C91006; background: none; border: none;
+  cursor: pointer; padding: 4px 8px; border-radius: 4px; font-weight: 500;
+  display: none; transition: background 0.15s;
+}
+.btn-reset:hover { background: #fff0ef; }
+.btn-reset.on { display: block; }
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04);
+}
+.card-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #ccc; margin-bottom: 18px;
+}
+
+/* Charts row */
+.charts-row { display: grid; grid-template-columns: 300px 1fr; gap: 14px; margin-bottom: 14px; }
+
+/* Distribution */
+.dist-row { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
+.dist-row:last-child { margin-bottom: 0; }
+.dist-label { width: 22px; font-size: 12px; font-weight: 600; color: #666; text-align: right; flex-shrink: 0; }
+.dist-track { flex: 1; height: 22px; background: #f3f2ee; border-radius: 4px; overflow: hidden; }
+.dist-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.dist-stats { width: 76px; font-size: 12px; color: #bbb; text-align: right; flex-shrink: 0; }
+.dist-stats strong { color: #444; font-weight: 600; }
+.f5 { background: #3d8c5f; } .f4 { background: #72a87e; }
+.f3 { background: #c9a84c; } .f2 { background: #e07845; } .f1 { background: #c94035; }
+
+/* Timeline */
+.timeline-controls { display: flex; gap: 5px; margin-bottom: 14px; }
+.tbtn {
+  padding: 4px 11px; border: 1px solid #e8e6e0; border-radius: 5px;
+  font-size: 12px; cursor: pointer; background: white; color: #888;
+  transition: all 0.12s; font-weight: 500;
+}
+.tbtn.active { background: #1a1a1a; border-color: #1a1a1a; color: white; }
+#timelineCanvas { width: 100%; display: block; cursor: crosshair; }
+.tooltip {
+  position: fixed; background: rgba(20,20,20,0.88); color: white;
+  padding: 6px 11px; border-radius: 6px; font-size: 12px;
+  pointer-events: none; display: none; z-index: 9999; white-space: nowrap;
+}
+
+/* Restaurants */
+.rest-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.rest-row:last-child { margin-bottom: 0; }
+.rest-name { width: 220px; font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.rest-track { flex: 1; height: 12px; background: #f3f2ee; border-radius: 3px; overflow: hidden; }
+.rest-fill { height: 100%; background: #C91006; border-radius: 3px; opacity: 0.65; transition: width 0.4s; }
+.rest-meta { width: 80px; font-size: 11px; color: #aaa; text-align: right; flex-shrink: 0; }
+
+/* Table */
+.table-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.table-hdr .card-title { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 8px 12px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.6px; color: #ccc;
+  border-bottom: 1px solid #ede9e3;
+  white-space: nowrap; user-select: none;
+}
+th.srt { cursor: pointer; }
+th.srt:hover { color: #888; }
+th.asc::after { content: ' ↑'; color: #C91006; }
+th.dsc::after { content: ' ↓'; color: #C91006; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f2ee; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafaf8; }
+tr.low-row td:first-child { border-left: 2px solid #c94035; padding-left: 10px; }
+
+.stars { letter-spacing: 1px; font-size: 13px; }
+.se { color: #e8e8e4; }
+.s1, .s2 { color: #c94035; } .s3 { color: #c9a84c; } .s4 { color: #72a87e; } .s5 { color: #3d8c5f; }
+.date-col { color: #aaa; font-size: 12px; white-space: nowrap; }
+.rest-col { font-weight: 500; }
+.cust-col { color: #666; }
+.cmt { color: #777; font-style: italic; max-width: 300px; }
+.cmt-empty { color: #ddd; }
+.flag { font-size: 13px; }
+
+/* Pagination */
+.pg { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.pg-info { font-size: 12px; color: #bbb; margin-right: 6px; }
+.pb {
+  min-width: 30px; height: 28px; padding: 0 7px; border: 1px solid #e8e6e0;
+  border-radius: 5px; cursor: pointer; background: white; font-size: 12px; color: #666;
+  transition: all 0.12s;
+}
+.pb:hover:not([disabled]) { border-color: #C91006; color: #C91006; }
+.pb.on { background: #C91006; border-color: #C91006; color: white; }
+.pb[disabled] { opacity: 0.3; cursor: default; }
+.pg-dots { font-size: 12px; color: #ccc; padding: 0 3px; }
+.no-data { text-align: center; padding: 48px; color: #ccc; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="tooltip" id="tip"></div>
+
+<header class="header">
+  <div class="header-left">
+    <span class="header-brand">Ando</span>
+    <div class="header-divider"></div>
+    <span class="header-title">Customer Reviews</span>
+  </div>
+  <span class="header-meta" id="hMeta">558 reviews · Dec 2025 – Mar 2026</span>
+</header>
+
+<div class="container">
+
+  <div class="kpi-grid">
+    <div class="kpi primary">
+      <div class="kpi-label">Avg Rating</div>
+      <div class="kpi-value" id="kAvg">4.18</div>
+      <div class="rating-mini" id="kStars"></div>
+      <div class="kpi-sub">out of 5.0</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Reviews</div>
+      <div class="kpi-value" id="kTotal">558</div>
+      <div class="kpi-sub" id="kTotalSub">All time</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">5★ Rate</div>
+      <div class="kpi-value" id="kFivePct">63.8%</div>
+      <div class="kpi-sub" id="kFiveSub">356 reviews</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">This Week</div>
+      <div class="kpi-value" id="kWeek">43</div>
+      <div class="kpi-sub">Last 7 days</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">This Month</div>
+      <div class="kpi-value" id="kMonth">204</div>
+      <div class="kpi-sub">Last 30 days</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="fg">
+      <span class="fl">Country</span>
+      <select class="fs" id="fCountry" onchange="onCountry()">
+        <option value="">All Countries</option>
+        <option value="Kenya">Kenya</option>
+        <option value="Rwanda">Rwanda</option>
+      </select>
+    </div>
+    <div class="fg">
+      <span class="fl">Period</span>
+      <select class="fs" id="fPeriod" onchange="applyFilters()">
+        <option value="">All Time</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+    </div>
+    <div class="fg">
+      <span class="fl">Restaurant</span>
+      <select class="fs" id="fRest" onchange="applyFilters()">
+        <option value="">All Restaurants</option>
+      </select>
+    </div>
+    <div class="fg" style="border-right:none;">
+      <span class="fl">Rating</span>
+      <select class="fs" id="fRating" onchange="applyFilters()">
+        <option value="">All Ratings</option>
+        <option value="5">5★ Only</option>
+        <option value="low">1–2★ Low</option>
+        <option value="mid">3★ Mid</option>
+        <option value="high">4–5★ High</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <span class="result-count" id="rCount">558 reviews</span>
+      <button class="btn-reset" id="btnReset" onclick="resetFilters()">Clear filters ×</button>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">Rating Distribution</div>
+      <div id="distChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Reviews Over Time</div>
+      <div class="timeline-controls">
+        <button class="tbtn active" onclick="setG('day',this)">Day</button>
+        <button class="tbtn" onclick="setG('week',this)">Week</button>
+        <button class="tbtn" onclick="setG('month',this)">Month</button>
+      </div>
+      <canvas id="timelineCanvas"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;">
+      <span class="card-title" style="margin-bottom:0;">Top Restaurants by Rating</span>
+      <span style="font-size:11px;color:#ccc;">min. 10 reviews · bar = avg rating out of 5</span>
+    </div>
+    <div id="restChart"></div>
+  </div>
+
+  <div class="card">
+    <div class="table-hdr">
+      <span class="card-title">All Reviews</span>
+      <div class="pg" id="pgTop"></div>
+    </div>
+    <div id="tBody"></div>
+    <div style="margin-top:16px;display:flex;justify-content:flex-end;" id="pgBot"></div>
+  </div>
+
+</div>
+
+<script>
+const ALL = [{"d":"2026-03-20","t":"09:29","o":"146607","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Diane","rt":5,"cm":""},{"d":"2026-03-19","t":"20:04","o":"164440","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Muthoni","rt":2,"cm":"The pasta wasn't well cooked and it was dry. Not well seasoned."},{"d":"2026-03-19","t":"19:52","o":"154067","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Alexandriah G","rt":3,"cm":"The tiramisu was not as per presented which was a bit disappointing. All in all the pasta was good and well cooked along with the chicken"},{"d":"2026-03-19","t":"19:32","o":"169393","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nyambura","rt":1,"cm":"Too much pesto"},{"d":"2026-03-19","t":"17:49","o":"130082","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Sarah","rt":2,"cm":"Why would you only fill that big box of fries half way when the fries are paid for separately??Stop being cheap."},{"d":"2026-03-19","t":"15:32","o":"172592","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Cassie","rt":5,"cm":""},{"d":"2026-03-19","t":"14:53","o":"173144","rs":"The Hook Restaurant & Aroma Coffee House","co":"Rwanda","ci":"Kigali","n":"Ange uwera","rt":5,"cm":""},{"d":"2026-03-19","t":"13:27","o":"170818","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mary","rt":1,"cm":"I ordered for a biscoff cheesecake and you sent tiramisu instead"},{"d":"2026-03-18","t":"21:55","o":"171108","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":4,"cm":""},{"d":"2026-03-18","t":"21:44","o":"171405","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-03-18","t":"15:01","o":"172016","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Mutoni","rt":4,"cm":""},{"d":"2026-03-18","t":"14:55","o":"172837","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Michelle","rt":4,"cm":""},{"d":"2026-03-18","t":"10:09","o":"166746","rs":"Steady pizza chicken house","co":"Rwanda","ci":"Kigali","n":"Joshua","rt":5,"cm":"The delivery as smooth and the service 10/10 please keep doing your thing"},{"d":"2026-03-17","t":"18:28","o":"171644","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Jovan Reid","rt":4,"cm":""},{"d":"2026-03-17","t":"11:59","o":"171509","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Ivan Ntwali","rt":5,"cm":"Please add a option to pay online"},{"d":"2026-03-17","t":"00:03","o":"159395","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Shema Emmanuel","rt":1,"cm":""},{"d":"2026-03-16","t":"13:42","o":"170913","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-03-16","t":"12:04","o":"171400","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Lisa","rt":5,"cm":""},{"d":"2026-03-16","t":"11:10","o":"153293","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Esther M","rt":5,"cm":""},{"d":"2026-03-15","t":"21:45","o":"171109","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Angoue David","rt":5,"cm":""},{"d":"2026-03-15","t":"18:31","o":"167624","rs":"Siam Thai Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Aoko O","rt":1,"cm":"Why is this order showing delivered and it hasn’t???What is going on here?For the record this was NOT delivered neither was I contacted."},{"d":"2026-03-15","t":"18:19","o":"109770","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Dalvin Kinyua","rt":5,"cm":""},{"d":"2026-03-15","t":"15:30","o":"102673","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Kelvin","rt":1,"cm":"Got the wrong order. I ordered two burgers, one poussin fries and an orange and mint lemonade. What got delivered were three burger"},{"d":"2026-03-15","t":"15:25","o":"163671","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mary","rt":5,"cm":"Tasty biryani"},{"d":"2026-03-15","t":"12:26","o":"171903","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Munira Alibhai","rt":5,"cm":"Amazing taste , à slightly bigger  portion thiugh would be appreciated , overall satisfactory"},{"d":"2026-03-15","t":"01:45","o":"169686","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"Brigitte","rt":4,"cm":""},{"d":"2026-03-14","t":"19:28","o":"169699","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Bucyana Mwiza","rt":5,"cm":"Right on time!!"},{"d":"2026-03-14","t":"19:23","o":"171025","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Sheila Karimi","rt":5,"cm":""},{"d":"2026-03-14","t":"18:55","o":"107700","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nimo","rt":5,"cm":""},{"d":"2026-03-14","t":"18:03","o":"164713","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Neville","rt":3,"cm":""},{"d":"2026-03-14","t":"15:51","o":"162582","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Joysline Kamero","rt":1,"cm":"I HAVE NOT RECEIVED ANY ORDER"},{"d":"2026-03-14","t":"15:28","o":"171560","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"TURASHIMYE Dorian","rt":5,"cm":""},{"d":"2026-03-14","t":"14:30","o":"145736","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Daisy Chichah","rt":5,"cm":""},{"d":"2026-03-14","t":"13:44","o":"171238","rs":"Barista & Co.","co":"Kenya","ci":"Nairobi","n":"George","rt":5,"cm":""},{"d":"2026-03-13","t":"21:53","o":"136246","rs":"Smash Burgers by Ando","co":"Kenya","ci":"Nairobi","n":"Adrian Abraham Kiplimo","rt":5,"cm":""},{"d":"2026-03-13","t":"20:40","o":"169353","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Lisa","rt":4,"cm":"5 star for mama lasagna. It was 🔥. Spaghetti Bolognese was 👎. Mostly spaghetti with v.little minced meat and cheese, tasted  raw spice 😭"},{"d":"2026-03-13","t":"19:39","o":"148375","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mugabo","rt":3,"cm":""},{"d":"2026-03-13","t":"17:15","o":"170236","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Gwiza","rt":1,"cm":"I didn’t get my order and calling center is off."},{"d":"2026-03-13","t":"15:08","o":"144882","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Rhady Gasingwa","rt":3,"cm":""},{"d":"2026-03-13","t":"14:13","o":"151361","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Jesse","rt":5,"cm":"Fast"},{"d":"2026-03-13","t":"13:59","o":"169014","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Janet","rt":5,"cm":"i love y’all so much"},{"d":"2026-03-13","t":"13:47","o":"167731","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"David.M","rt":5,"cm":"Good"},{"d":"2026-03-13","t":"13:44","o":"164889","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Bakhita-naomi","rt":5,"cm":""},{"d":"2026-03-12","t":"23:11","o":"170474","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":4,"cm":""},{"d":"2026-03-12","t":"22:33","o":"171099","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Djeny Shema","rt":1,"cm":"The food was very cold. I ordered a burger without tomatoes but they didn’t execute it and also for the spicy mayo but they put garlic"},{"d":"2026-03-12","t":"22:06","o":"167627","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Shema Sady","rt":5,"cm":""},{"d":"2026-03-12","t":"21:38","o":"129009","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Agnes","rt":4,"cm":"That discount ❤️❤️"},{"d":"2026-03-12","t":"20:13","o":"170979","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"UWIDUHAYE Beatrice","rt":5,"cm":"It was nice and delicious 😋🙏 thank you so much"},{"d":"2026-03-12","t":"18:06","o":"164065","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Monalisa","rt":5,"cm":""},{"d":"2026-03-12","t":"17:52","o":"170190","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-03-12","t":"17:33","o":"168737","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Yannick Haguma","rt":4,"cm":""},{"d":"2026-03-12","t":"15:53","o":"170847","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Kundwa Dorian","rt":5,"cm":""},{"d":"2026-03-12","t":"14:51","o":"162485","rs":"Siam Thai Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Michelle","rt":4,"cm":"Could be more spicy or have spice level options"},{"d":"2026-03-12","t":"12:36","o":"170643","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Makura Rose","rt":4,"cm":"Burger was amazing but the fries were too lemony"},{"d":"2026-03-12","t":"12:00","o":"168806","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Joel Okoth Sewe","rt":5,"cm":"Great experience"},{"d":"2026-03-12","t":"09:23","o":"168934","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Zippy K","rt":3,"cm":""},{"d":"2026-03-11","t":"23:54","o":"162245","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Mariette","rt":4,"cm":"Food comes cold but delicious though"},{"d":"2026-03-11","t":"20:07","o":"170672","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Maureen Nyathira","rt":5,"cm":""},{"d":"2026-03-11","t":"19:17","o":"118339","rs":"Siam Thai Kitchen, NSK","co":"Kenya","ci":"Nairobi","n":"Cristo","rt":1,"cm":"Still haven’t received tho shown “delibered - call me asap!"},{"d":"2026-03-11","t":"17:41","o":"168546","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Betty Mueni","rt":5,"cm":"Delicious!"},{"d":"2026-03-11","t":"16:00","o":"132555","rs":"Ichiban Sushi","co":"Kenya","ci":"Nairobi","n":"Ruth Cherop Mbatiany","rt":1,"cm":"Definitely not the same roll I ordered"},{"d":"2026-03-11","t":"15:51","o":"163548","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Yann Ngarambe","rt":5,"cm":""},{"d":"2026-03-11","t":"15:09","o":"153701","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Uwase Amina ketsia","rt":5,"cm":""},{"d":"2026-03-11","t":"15:00","o":"140767","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Himesh patel","rt":2,"cm":""},{"d":"2026-03-11","t":"14:57","o":"170222","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Keza","rt":4,"cm":"Good"},{"d":"2026-03-11","t":"13:20","o":"169264","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Eder Munyampenda","rt":5,"cm":""},{"d":"2026-03-11","t":"00:56","o":"168144","rs":"Kigali Burgers","co":"Rwanda","ci":"Kigali","n":"Kariza Ganza Loryn","rt":5,"cm":"Everything was 10/10"},{"d":"2026-03-10","t":"21:54","o":"170265","rs":"Siam Thai Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mwana’kissah","rt":3,"cm":""},{"d":"2026-03-10","t":"19:42","o":"170081","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Gaju Celia","rt":5,"cm":""},{"d":"2026-03-10","t":"18:42","o":"167739","rs":"Steady pizza chicken house","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-03-10","t":"18:20","o":"166480","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Kaliza keva","rt":5,"cm":""},{"d":"2026-03-10","t":"16:51","o":"170123","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Dynah reine","rt":5,"cm":""},{"d":"2026-03-10","t":"15:54","o":"170103","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mary Kimani","rt":5,"cm":""},{"d":"2026-03-10","t":"15:43","o":"170055","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Girish","rt":5,"cm":""},{"d":"2026-03-09","t":"21:00","o":"169900","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"Sam","rt":5,"cm":"Received bonus pineapple soda)"},{"d":"2026-03-09","t":"20:07","o":"163091","rs":"Smash Burgers by Ando","co":"Kenya","ci":"Nairobi","n":"Tracy","rt":5,"cm":""},{"d":"2026-03-09","t":"18:43","o":"165116","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Beverly Karimi","rt":5,"cm":"I really enjoyed the shroom burger! I’m addicted at this point! And I Loved the portion of the shroom fries and they tasted good too!"},{"d":"2026-03-09","t":"14:22","o":"153914","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Iradukunda Jean pierre","rt":5,"cm":""},{"d":"2026-03-09","t":"13:39","o":"169754","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Catherine","rt":5,"cm":""},{"d":"2026-03-09","t":"13:33","o":"165314","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Mandhi","rt":5,"cm":""},{"d":"2026-03-08","t":"20:51","o":"165176","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Wanjiku Kinyanjui","rt":5,"cm":""},{"d":"2026-03-08","t":"14:03","o":"169351","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Lisa","rt":5,"cm":""},{"d":"2026-03-08","t":"12:41","o":"162107","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Nyambura","rt":1,"cm":"Nothing was delivered. I waited 3 hours for food that never got to me. The communication was whack and just lies"},{"d":"2026-03-07","t":"18:19","o":"169073","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"George Kahindi","rt":5,"cm":""},{"d":"2026-03-07","t":"17:25","o":"169066","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Ava","rt":5,"cm":""},{"d":"2026-03-07","t":"17:21","o":"169067","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Maureen Kimario","rt":4,"cm":"Tasty lasagna, nicely saucy with mild spice. Delivery was fast, prep took long but worth it."},{"d":"2026-03-07","t":"17:04","o":"116684","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Maureen Nyathira","rt":5,"cm":"I did not receive the juice"},{"d":"2026-03-07","t":"10:39","o":"126210","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Jj","rt":5,"cm":""},{"d":"2026-03-07","t":"03:36","o":"163207","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Haddish","rt":5,"cm":""},{"d":"2026-03-06","t":"23:21","o":"161663","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Winfrey Adelaide","rt":5,"cm":"Despite the heavy rains my food came dry well packaged and hot. Douglas' customer service was top notch as well!....Thank you!"},{"d":"2026-03-06","t":"17:04","o":"161648","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Gideon U","rt":5,"cm":""},{"d":"2026-03-06","t":"15:50","o":"167757","rs":"Yeet Coffee & More","co":"Rwanda","ci":"Kigali","n":"Sabrina ishimwe","rt":2,"cm":""},{"d":"2026-03-06","t":"15:16","o":"166424","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":1,"cm":""},{"d":"2026-03-06","t":"13:53","o":"168381","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Danu Temelie","rt":5,"cm":"The food was very delayed in delivery"},{"d":"2026-03-06","t":"13:49","o":"166558","rs":"Hot Pot Pizzeria","co":"Rwanda","ci":"Kigali","n":"Umurerwa Jessy","rt":1,"cm":""},{"d":"2026-03-06","t":"12:51","o":"168670","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Victoria Gachigua","rt":5,"cm":""},{"d":"2026-03-06","t":"12:46","o":"168795","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Cindy Thairu","rt":5,"cm":""},{"d":"2026-03-05","t":"21:30","o":"164385","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Claire Sabina","rt":5,"cm":""},{"d":"2026-03-05","t":"18:00","o":"140151","rs":"Pot of Jollof","co":"Kenya","ci":"Nairobi","n":"Kermelhys","rt":5,"cm":"Ok c’est Kermelhys"},{"d":"2026-03-05","t":"16:50","o":"165464","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Angoue David","rt":5,"cm":""},{"d":"2026-03-05","t":"14:44","o":"165911","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mutoni","rt":5,"cm":""},{"d":"2026-03-05","t":"13:31","o":"138756","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Joysline Kamero","rt":5,"cm":""},{"d":"2026-03-05","t":"07:59","o":"162232","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Lydia","rt":3,"cm":""},{"d":"2026-03-04","t":"20:56","o":"167907","rs":"Siam Thai Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Tom","rt":5,"cm":""},{"d":"2026-03-04","t":"18:49","o":"168138","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Kariza Ganza Loryn","rt":2,"cm":"I asked for Coca-Cola but instead got Pineapple fanta and I never also got extra sauce."},{"d":"2026-03-04","t":"17:41","o":"166280","rs":"McCason Pizza","co":"Rwanda","ci":"Kigali","n":"Happy","rt":5,"cm":""},{"d":"2026-03-04","t":"16:35","o":"166131","rs":"Hot Pot Pizzeria","co":"Rwanda","ci":"Kigali","n":"Shema Sady","rt":5,"cm":""},{"d":"2026-03-04","t":"10:16","o":"165416","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Naisenya Wanjiku","rt":4,"cm":""},{"d":"2026-03-03","t":"22:22","o":"167917","rs":"Steady pizza chicken house","co":"Rwanda","ci":"Kigali","n":"cyusa herve","rt":5,"cm":"Since l started using Ando  it has been the best experience compared to vuba vuba plus the customer support is top notch really like it"},{"d":"2026-03-03","t":"22:16","o":"166882","rs":"Afrinaija Pots Restaurant","co":"Rwanda","ci":"Kigali","n":"Mahmud Oloyede","rt":5,"cm":"I like ando very much their service and the delivery time is accurate plus l like the customer support really professional and kind 😁"},{"d":"2026-03-03","t":"20:11","o":"167843","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Winnie","rt":5,"cm":""},{"d":"2026-03-03","t":"19:31","o":"141557","rs":"TastiWOK","co":"Kenya","ci":"Nairobi","n":"Lydia","rt":2,"cm":""},{"d":"2026-03-03","t":"19:04","o":"165765","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Gaby","rt":1,"cm":"There is hardly any in this overpriced bolognese. The food used to be better"},{"d":"2026-03-03","t":"18:05","o":"167646","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Sabrina ishimwe","rt":4,"cm":"The rider was friendly and the burger tastes real good"},{"d":"2026-03-03","t":"17:26","o":"149241","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Roxanne KABANDA","rt":5,"cm":""},{"d":"2026-03-03","t":"17:01","o":"148155","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Sabattinah Tojonirina","rt":4,"cm":"The driver was nice but the order took time to arrive here. The burger was good but I didn't have any sauce with the fries."},{"d":"2026-03-03","t":"15:45","o":"167504","rs":"Kigali Special Pilau","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-03-03","t":"15:14","o":"166508","rs":"Pizza Corner, Since 1989","co":"Kenya","ci":"Nairobi","n":"Danielle","rt":5,"cm":""},{"d":"2026-03-03","t":"15:14","o":"164836","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Sabrina ishimwe","rt":4,"cm":""},{"d":"2026-03-02","t":"17:02","o":"166429","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-03-02","t":"11:00","o":"129518","rs":"Nargis Restaurant","co":"Kenya","ci":"Nairobi","n":"Samar Patel","rt":1,"cm":"Food was cold and soggy"},{"d":"2026-03-01","t":"21:31","o":"165094","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Tiffany","rt":1,"cm":"I HAVE NOT RECEIVED MY ORDER!????"},{"d":"2026-03-01","t":"21:11","o":"162876","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Njeri C","rt":5,"cm":""},{"d":"2026-03-01","t":"20:22","o":"158043","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"dash","rt":2,"cm":"My order was wrong they gave 1 burger when I ordered for 2"},{"d":"2026-03-01","t":"20:02","o":"135481","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Alison","rt":1,"cm":"My order says it has been delivered yet I haven’t received it and no communication. And the customer care number isn’t picked up"},{"d":"2026-03-01","t":"18:52","o":"156570","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Tania","rt":4,"cm":""},{"d":"2026-03-01","t":"18:48","o":"151893","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Davy","rt":3,"cm":""},{"d":"2026-03-01","t":"17:39","o":"165092","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Ciku","rt":1,"cm":"Spaghetti is undercooked and stuck together"},{"d":"2026-03-01","t":"17:33","o":"167266","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Manzi Cynthia","rt":5,"cm":""},{"d":"2026-03-01","t":"16:24","o":"167227","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Paul Owiti","rt":1,"cm":"Haven’t received my order. And nobody is responding to my calls in the customer service line."},{"d":"2026-03-01","t":"15:39","o":"163134","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Manzi Kelvin","rt":5,"cm":""},{"d":"2026-03-01","t":"11:41","o":"166724","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Clement","rt":5,"cm":""},{"d":"2026-02-28","t":"23:48","o":"163515","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"dorcy umutoni","rt":1,"cm":""},{"d":"2026-02-28","t":"18:12","o":"159153","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Milca Louange","rt":2,"cm":""},{"d":"2026-02-28","t":"16:38","o":"165937","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Joshua","rt":5,"cm":"The food was perfect and the customer service for ando is top notch"},{"d":"2026-02-28","t":"16:34","o":"165983","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Faith Wamuyu","rt":5,"cm":""},{"d":"2026-02-28","t":"14:30","o":"165486","rs":"TastiWOK","co":"Kenya","ci":"Nairobi","n":"Selaine Jommo","rt":1,"cm":"The chilli beef was burned to bitterness. The ginger beef was very bland,no ginger."},{"d":"2026-02-28","t":"12:13","o":"165608","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Clement","rt":5,"cm":""},{"d":"2026-02-28","t":"05:08","o":"164562","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Lisa","rt":5,"cm":"I loved the burger ❤️❤️❤️"},{"d":"2026-02-27","t":"23:05","o":"166302","rs":"Afrinaija Pots Restaurant","co":"Rwanda","ci":"Kigali","n":"Abraham","rt":1,"cm":"Completely disappointed. Your 9k plate on Ando is so small it’s not worth it. The soups I’ve ordered also have issues. No more orders then."},{"d":"2026-02-27","t":"22:25","o":"154627","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Joel","rt":5,"cm":"It was still hot, despite the long wait. The ‘regular’ portions should be bigger. Overall very great service and delicious meal."},{"d":"2026-02-27","t":"20:12","o":"163963","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Paul mahoro","rt":1,"cm":"I got nothing"},{"d":"2026-02-27","t":"20:05","o":"143998","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Teta Ariella Sarah","rt":5,"cm":""},{"d":"2026-02-27","t":"18:46","o":"164136","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Shimwa Uwase Olisa","rt":5,"cm":""},{"d":"2026-02-27","t":"18:40","o":"160664","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Livia","rt":5,"cm":""},{"d":"2026-02-27","t":"18:02","o":"166474","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"Joshua Stanley hotay","rt":2,"cm":"I wanted sausy but it came very dry and ttheres not even one condment"},{"d":"2026-02-27","t":"16:31","o":"165931","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-02-27","t":"16:24","o":"166211","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nadia","rt":5,"cm":""},{"d":"2026-02-27","t":"15:51","o":"165613","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":1,"cm":""},{"d":"2026-02-27","t":"15:14","o":"146080","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Tony ishimwe","rt":5,"cm":""},{"d":"2026-02-27","t":"14:56","o":"161845","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Marcellin","rt":2,"cm":"You gave me chips that were reheated and I wasn’t able to enjoy my lunch. It’s not nice!😤😡"},{"d":"2026-02-27","t":"14:15","o":"165938","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Faith Wamuyu","rt":4,"cm":"Not well done"},{"d":"2026-02-27","t":"00:11","o":"166119","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Elnaam","rt":5,"cm":""},{"d":"2026-02-26","t":"15:25","o":"162923","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Zippy K","rt":5,"cm":""},{"d":"2026-02-26","t":"12:50","o":"162934","rs":"Chicking","co":"Kenya","ci":"Nairobi","n":"L K","rt":3,"cm":""},{"d":"2026-02-25","t":"19:00","o":"165909","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-02-24","t":"21:11","o":"164316","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Nicole","rt":1,"cm":"Haven’t received my order yet, helpline is not working"},{"d":"2026-02-24","t":"21:10","o":"165452","rs":"Chicking","co":"Kenya","ci":"Nairobi","n":"Samuel","rt":1,"cm":"I ordered for 2 for 1 deal of the 6 piece chicken (so 2 boxes) have not recieved the other box, only one. Very misleading and disappointing"},{"d":"2026-02-24","t":"20:54","o":"165768","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Irumva lael","rt":5,"cm":"J"},{"d":"2026-02-24","t":"20:10","o":"153421","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"BATAMURIZA ISIMBI Sylvie","rt":2,"cm":""},{"d":"2026-02-24","t":"19:51","o":"148585","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nicole","rt":5,"cm":""},{"d":"2026-02-24","t":"19:25","o":"164011","rs":"TastiGo","co":"Kenya","ci":"Nairobi","n":"Samuel","rt":5,"cm":"The food was amazing"},{"d":"2026-02-24","t":"12:20","o":"157905","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Daisy Lorna","rt":5,"cm":""},{"d":"2026-02-23","t":"21:49","o":"161166","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Jamie","rt":2,"cm":"I have been ordering this for more than a year but it’s been disappointing lately. First it was dry bread and now the burger had a smell 😭"},{"d":"2026-02-23","t":"16:47","o":"158632","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Bucyana Mwiza","rt":3,"cm":""},{"d":"2026-02-23","t":"15:57","o":"165310","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Ikirezi Diana","rt":5,"cm":""},{"d":"2026-02-23","t":"15:56","o":"161116","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"Esther INEZA","rt":3,"cm":""},{"d":"2026-02-23","t":"12:58","o":"160729","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Beverly Karimi","rt":5,"cm":""},{"d":"2026-02-22","t":"21:30","o":"136118","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Cynthia","rt":4,"cm":"Delicious but order took too long."},{"d":"2026-02-22","t":"21:10","o":"152291","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Ndungutse","rt":5,"cm":"Time which they said it would arrive was the same time they arrived which was very nice 👍🏽👍🏽"},{"d":"2026-02-22","t":"20:43","o":"165144","rs":"Chickiez Fried Chicken Kigali","co":"Rwanda","ci":"Kigali","n":"Ngoboka Hirwa Michel","rt":3,"cm":"I requested for Fanta Sprite but got coca cola"},{"d":"2026-02-22","t":"20:33","o":"131810","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Jess","rt":2,"cm":""},{"d":"2026-02-22","t":"20:13","o":"160092","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Bishoy george","rt":5,"cm":""},{"d":"2026-02-22","t":"19:43","o":"164492","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Gwiza","rt":4,"cm":""},{"d":"2026-02-22","t":"19:38","o":"165004","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Gisèle Rutayisire","rt":4,"cm":"The food was delivered so late so the taste was not up to standard"},{"d":"2026-02-22","t":"18:23","o":"165095","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Marion chela","rt":4,"cm":"Vincent deserves his flowers"},{"d":"2026-02-22","t":"15:20","o":"165014","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Alex","rt":5,"cm":""},{"d":"2026-02-22","t":"14:43","o":"135020","rs":"Pizza Corner, Since 1989","co":"Kenya","ci":"Nairobi","n":"Prabhath Madusanka","rt":4,"cm":"Order is not delivered Yet! Please share the delivery person contact!"},{"d":"2026-02-21","t":"21:43","o":"164918","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"chris koech","rt":4,"cm":""},{"d":"2026-02-21","t":"18:57","o":"164535","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"aya amir salih","rt":5,"cm":""},{"d":"2026-02-21","t":"15:35","o":"151188","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Igihozo Maryam","rt":5,"cm":""},{"d":"2026-02-21","t":"13:23","o":"161935","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Gatera Yves","rt":4,"cm":""},{"d":"2026-02-21","t":"10:45","o":"141862","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Whitney Makotsi","rt":4,"cm":""},{"d":"2026-02-20","t":"20:06","o":"164553","rs":"Best Nigerian Jollof Restaurant","co":"Rwanda","ci":"Kigali","n":"Neil","rt":5,"cm":""},{"d":"2026-02-20","t":"18:18","o":"144664","rs":"SuperWings, Westlands","co":"Kenya","ci":"Nairobi","n":"Tess","rt":5,"cm":""},{"d":"2026-02-20","t":"15:00","o":"162723","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Maeva Gakima","rt":1,"cm":"Your ETA is not accurate and customer care responds after a day and also that was a wrap not a Taco bro🤨"},{"d":"2026-02-20","t":"02:22","o":"163256","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Joshua","rt":5,"cm":""},{"d":"2026-02-19","t":"22:18","o":"141493","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Lina Eltayeb","rt":5,"cm":""},{"d":"2026-02-19","t":"21:54","o":"156869","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Allana Ogola","rt":5,"cm":""},{"d":"2026-02-19","t":"20:48","o":"164251","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"EMMAH MWANGI","rt":5,"cm":""},{"d":"2026-02-19","t":"19:45","o":"163892","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Stephanie Wanjiru","rt":5,"cm":""},{"d":"2026-02-19","t":"19:33","o":"163615","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mohammed","rt":4,"cm":""},{"d":"2026-02-19","t":"17:44","o":"159301","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Blaise_","rt":5,"cm":""},{"d":"2026-02-19","t":"17:19","o":"158124","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Keza Keila Eunice","rt":1,"cm":"They got my order wrong"},{"d":"2026-02-19","t":"15:48","o":"164133","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Shimwa Uwase Olisa","rt":5,"cm":""},{"d":"2026-02-19","t":"15:02","o":"159473","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Mark","rt":5,"cm":""},{"d":"2026-02-19","t":"14:41","o":"155489","rs":"Kurry Kingdom","co":"Rwanda","ci":"Kigali","n":"Kenny Fabrice Nyirumuringa","rt":5,"cm":"You the best"},{"d":"2026-02-19","t":"02:10","o":"160566","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Mohammed Ahmed","rt":4,"cm":""},{"d":"2026-02-18","t":"22:34","o":"163797","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Ella Ingabire","rt":5,"cm":""},{"d":"2026-02-18","t":"20:54","o":"164007","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Samuel","rt":5,"cm":"Fast delivery and fresh miso soup 🫶"},{"d":"2026-02-18","t":"18:23","o":"162203","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":1,"cm":"I ordered tacos but I got a burrito???"},{"d":"2026-02-18","t":"17:58","o":"162172","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"aya amir salih","rt":5,"cm":""},{"d":"2026-02-18","t":"16:43","o":"159421","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Gwiza","rt":4,"cm":""},{"d":"2026-02-18","t":"16:42","o":"163868","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Shimwa Uwase Olisa","rt":5,"cm":""},{"d":"2026-02-17","t":"23:16","o":"163632","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-02-17","t":"17:14","o":"163303","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Ella Ingabire","rt":5,"cm":""},{"d":"2026-02-17","t":"17:07","o":"163668","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mary","rt":5,"cm":""},{"d":"2026-02-17","t":"13:21","o":"145569","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Harriet","rt":3,"cm":"The open stapple on the package pricked me till I am bleeding"},{"d":"2026-02-17","t":"10:50","o":"162645","rs":"SuperWings, Westlands","co":"Kenya","ci":"Nairobi","n":"Danielle","rt":5,"cm":""},{"d":"2026-02-16","t":"21:23","o":"157543","rs":"KAI The Sushi Bar, Westlands","co":"Kenya","ci":"Nairobi","n":"Natasha Locho","rt":3,"cm":"Rice kept falling apart"},{"d":"2026-02-16","t":"20:05","o":"162904","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mwarstep","rt":5,"cm":""},{"d":"2026-02-16","t":"10:32","o":"150432","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Durran","rt":5,"cm":""},{"d":"2026-02-16","t":"08:52","o":"142913","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Gaby","rt":1,"cm":"The rice Is burnt, it also has random small pieces of what looks like tandoori chicken in it also there's an insect inside the rice. Please"},{"d":"2026-02-16","t":"05:25","o":"162546","rs":"Mr.Rolex","co":"Rwanda","ci":"Kigali","n":"Alvin","rt":5,"cm":""},{"d":"2026-02-15","t":"22:58","o":"155297","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Manucho","rt":4,"cm":""},{"d":"2026-02-15","t":"22:54","o":"157432","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Joshua","rt":5,"cm":""},{"d":"2026-02-15","t":"22:44","o":"149337","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Sheila macabxender","rt":4,"cm":"The food was delivered very late and it was cold I'm a student in a hostel I don't have the option to reheat the food."},{"d":"2026-02-15","t":"22:01","o":"147603","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Bee","rt":5,"cm":""},{"d":"2026-02-15","t":"21:18","o":"163217","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Vita Edwin","rt":5,"cm":""},{"d":"2026-02-15","t":"20:43","o":"116144","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Rawan walid","rt":5,"cm":""},{"d":"2026-02-15","t":"19:37","o":"162758","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Haddish","rt":5,"cm":"Best burgers ever!!!"},{"d":"2026-02-15","t":"18:36","o":"150278","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"Yvette","rt":3,"cm":""},{"d":"2026-02-15","t":"18:28","o":"161320","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Alvin","rt":4,"cm":""},{"d":"2026-02-15","t":"18:14","o":"156336","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Samiati","rt":5,"cm":""},{"d":"2026-02-15","t":"16:55","o":"163043","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Robert","rt":5,"cm":""},{"d":"2026-02-15","t":"15:58","o":"162618","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Jason Muiruri Kioli","rt":4,"cm":""},{"d":"2026-02-15","t":"15:27","o":"162477","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Monalisa","rt":4,"cm":""},{"d":"2026-02-15","t":"12:23","o":"153398","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Jawaid","rt":4,"cm":""},{"d":"2026-02-15","t":"02:16","o":"141045","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Steve Mwaniki","rt":5,"cm":""},{"d":"2026-02-14","t":"23:56","o":"129603","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Shi","rt":4,"cm":""},{"d":"2026-02-14","t":"23:02","o":"158576","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Lucy","rt":4,"cm":"Delivery took too long. The rider was effective in communicating this though. The garlic naan was tasty."},{"d":"2026-02-14","t":"21:42","o":"134287","rs":"Pizza Corner, Since 1989","co":"Kenya","ci":"Nairobi","n":"Jeffery","rt":4,"cm":""},{"d":"2026-02-14","t":"21:41","o":"162858","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Sonia shelly","rt":4,"cm":"Tasty but check on the pirtion."},{"d":"2026-02-14","t":"21:18","o":"155174","rs":"Chicking","co":"Kenya","ci":"Nairobi","n":"L K","rt":1,"cm":"Idk not likely to eat it..."},{"d":"2026-02-14","t":"20:47","o":"160110","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Shadrack Isingoma","rt":5,"cm":""},{"d":"2026-02-14","t":"20:12","o":"148304","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Belinda Ndetei","rt":5,"cm":""},{"d":"2026-02-14","t":"19:03","o":"162682","rs":"Kigali Burgers","co":"Rwanda","ci":"Kigali","n":"Haddish","rt":5,"cm":"Customer service was top notch and the food arrived hot and scrumptious. Love this app! thanks to Kigali burgers. Very kind Riders as well."},{"d":"2026-02-14","t":"17:54","o":"162272","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Shema Sady","rt":5,"cm":""},{"d":"2026-02-14","t":"16:32","o":"158020","rs":"Chicking","co":"Kenya","ci":"Nairobi","n":"Matthew Wahome","rt":1,"cm":"I didn't recieve my full order. One pizza missing"},{"d":"2026-02-14","t":"14:55","o":"121416","rs":"Chicking","co":"Kenya","ci":"Nairobi","n":"Arigatou","rt":5,"cm":""},{"d":"2026-02-14","t":"14:37","o":"162476","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Monalisa","rt":5,"cm":""},{"d":"2026-02-14","t":"13:27","o":"162417","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Valerie","rt":4,"cm":"When my order arrived, the ranch had spilled all over my food and it couldn’t be used. None of it remained despite me paying an extra cost."},{"d":"2026-02-14","t":"11:24","o":"150218","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Lydia","rt":5,"cm":""},{"d":"2026-02-14","t":"11:05","o":"161848","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Norah Ndanu","rt":5,"cm":""},{"d":"2026-02-13","t":"22:02","o":"152420","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Roger Aimé Ishimwe Rudasingwa","rt":5,"cm":""},{"d":"2026-02-13","t":"20:27","o":"154874","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Cyusa","rt":1,"cm":""},{"d":"2026-02-13","t":"20:06","o":"159685","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":1,"cm":""},{"d":"2026-02-13","t":"18:39","o":"148601","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Victor","rt":5,"cm":""},{"d":"2026-02-13","t":"16:09","o":"157058","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Marcellin","rt":5,"cm":""},{"d":"2026-02-13","t":"15:29","o":"148296","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Kirezi Lamia","rt":1,"cm":"I ordered tacos and they brought me a wrap with huge chunks of meat. Highly disappointed as this is different from what was advertised on ig"},{"d":"2026-02-13","t":"13:36","o":"160877","rs":"Hot Pot Pizzeria","co":"Rwanda","ci":"Kigali","n":"Umurerwa Jessy","rt":5,"cm":""},{"d":"2026-02-12","t":"21:52","o":"161910","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"kanimba eddy","rt":5,"cm":""},{"d":"2026-02-12","t":"21:43","o":"159176","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Shema Sady","rt":5,"cm":""},{"d":"2026-02-12","t":"17:26","o":"161445","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-02-12","t":"16:06","o":"155236","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Claire Sabina","rt":5,"cm":"Delicious"},{"d":"2026-02-12","t":"15:26","o":"158622","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Kabiru","rt":5,"cm":""},{"d":"2026-02-12","t":"12:08","o":"160222","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Kitty Kat","rt":4,"cm":""},{"d":"2026-02-11","t":"20:31","o":"155047","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nina","rt":5,"cm":""},{"d":"2026-02-11","t":"17:37","o":"143707","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Leonce","rt":2,"cm":"Food wasn't good cheese wasn't cooked well"},{"d":"2026-02-11","t":"13:56","o":"157197","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Ivy Nimo","rt":5,"cm":""},{"d":"2026-02-11","t":"13:55","o":"161109","rs":"Chicking","co":"Kenya","ci":"Nairobi","n":"Vineet","rt":5,"cm":""},{"d":"2026-02-11","t":"13:08","o":"161068","rs":"Nargis Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-02-11","t":"09:02","o":"158519","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-02-10","t":"21:54","o":"161295","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Angella","rt":3,"cm":""},{"d":"2026-02-10","t":"17:22","o":"154210","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Khadidja","rt":5,"cm":""},{"d":"2026-02-09","t":"21:14","o":"160081","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Wanjiku Maina","rt":4,"cm":""},{"d":"2026-02-09","t":"20:13","o":"158677","rs":"Nargis Restaurant","co":"Kenya","ci":"Nairobi","n":"Imran Mohamedali","rt":4,"cm":"Good food! Just a bit too spicy for me"},{"d":"2026-02-09","t":"19:07","o":"160937","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Ty","rt":5,"cm":""},{"d":"2026-02-09","t":"16:19","o":"160201","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-02-09","t":"15:48","o":"160697","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Emery Lucky","rt":5,"cm":""},{"d":"2026-02-09","t":"13:29","o":"140078","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Grace","rt":5,"cm":""},{"d":"2026-02-09","t":"01:36","o":"144594","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Amanda","rt":1,"cm":"I just was eating my burger and found the plastic wrap on cheese."},{"d":"2026-02-08","t":"23:17","o":"131300","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"George Ndirangu","rt":5,"cm":"It was perfect"},{"d":"2026-02-08","t":"22:49","o":"159951","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Selaine Jommo","rt":4,"cm":"Please bring back the flaky chapati. But the meal was good."},{"d":"2026-02-08","t":"21:00","o":"160696","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Emery Lucky","rt":5,"cm":""},{"d":"2026-02-08","t":"18:04","o":"152705","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Earl Carter","rt":4,"cm":""},{"d":"2026-02-08","t":"17:38","o":"160590","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Isabel","rt":1,"cm":"My lasagna has almost no meat"},{"d":"2026-02-08","t":"17:28","o":"154045","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Keza","rt":5,"cm":""},{"d":"2026-02-08","t":"15:35","o":"158760","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"ahmed hakeem","rt":5,"cm":""},{"d":"2026-02-08","t":"14:43","o":"160342","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Livia","rt":5,"cm":""},{"d":"2026-02-08","t":"12:25","o":"147883","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Louisa","rt":5,"cm":""},{"d":"2026-02-07","t":"18:42","o":"160271","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Elsie","rt":5,"cm":"Loved it"},{"d":"2026-02-07","t":"18:09","o":"155235","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Jackline Chuma","rt":5,"cm":""},{"d":"2026-02-07","t":"17:09","o":"154203","rs":"New Roman's Choice Pizzas","co":"Rwanda","ci":"Kigali","n":"Mahmud Oloyede","rt":5,"cm":"Very great service from ANDO The delivery was smooth and faster and very professional everything arrived in good condition 💗. Keep it up th"},{"d":"2026-02-07","t":"17:01","o":"156762","rs":"Kigali Burgers","co":"Rwanda","ci":"Kigali","n":"Arnold Buoro","rt":3,"cm":""},{"d":"2026-02-06","t":"21:29","o":"160111","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Cyndy","rt":1,"cm":"I haven’t received my order sincerely"},{"d":"2026-02-06","t":"20:06","o":"141801","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Parfait","rt":1,"cm":""},{"d":"2026-02-05","t":"22:39","o":"159209","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Zippy K","rt":5,"cm":""},{"d":"2026-02-05","t":"19:08","o":"146295","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Patrick Muco","rt":5,"cm":""},{"d":"2026-02-05","t":"14:19","o":"152597","rs":"SuperWings, Kilimani","co":"Kenya","ci":"Nairobi","n":"Claire Sabina","rt":5,"cm":"Tasty"},{"d":"2026-02-04","t":"23:18","o":"158960","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Uwimana.H.D.Davin","rt":4,"cm":""},{"d":"2026-02-04","t":"18:56","o":"144497","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mucyo Ganza Lorenzo","rt":5,"cm":""},{"d":"2026-02-04","t":"18:43","o":"159478","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Umuhoza king onyx","rt":4,"cm":"There was no chips why"},{"d":"2026-02-04","t":"16:15","o":"127396","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Lima","rt":5,"cm":""},{"d":"2026-02-04","t":"14:50","o":"157774","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Ines","rt":4,"cm":""},{"d":"2026-02-04","t":"14:32","o":"149047","rs":"TastiWOK","co":"Kenya","ci":"Nairobi","n":"Tony","rt":5,"cm":""},{"d":"2026-02-03","t":"22:29","o":"149166","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Carmel","rt":5,"cm":""},{"d":"2026-02-03","t":"22:12","o":"158277","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"G","rt":5,"cm":""},{"d":"2026-02-03","t":"20:51","o":"159239","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Laurette","rt":5,"cm":""},{"d":"2026-02-03","t":"20:26","o":"157574","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Shaz","rt":2,"cm":""},{"d":"2026-02-03","t":"16:59","o":"155510","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Maellene Mpinganzima","rt":4,"cm":""},{"d":"2026-02-03","t":"16:20","o":"157797","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Shema Sady","rt":5,"cm":""},{"d":"2026-02-03","t":"15:51","o":"154657","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Milca Louange","rt":5,"cm":""},{"d":"2026-02-03","t":"14:49","o":"155934","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Gakuba Lisa Christa","rt":4,"cm":""},{"d":"2026-02-03","t":"12:08","o":"157968","rs":"Nargis Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-02-03","t":"11:06","o":"149205","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Wanjîkū","rt":5,"cm":""},{"d":"2026-02-03","t":"00:37","o":"154334","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Ndizeye Alibaba","rt":4,"cm":"I loved the whole experience. But as you grow think of a cashless option. That's my only suggestion."},{"d":"2026-02-02","t":"22:14","o":"157278","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"dorcy umutoni","rt":5,"cm":""},{"d":"2026-02-02","t":"20:50","o":"156031","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Racheal","rt":5,"cm":""},{"d":"2026-02-02","t":"20:04","o":"158329","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mohammed baderaldin","rt":5,"cm":""},{"d":"2026-02-02","t":"16:58","o":"158878","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Hope Njeri","rt":5,"cm":""},{"d":"2026-02-02","t":"15:53","o":"152128","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Kaliza keva","rt":5,"cm":"W delivery guy"},{"d":"2026-02-02","t":"15:35","o":"150612","rs":"Tamu Tamu Dishes","co":"Kenya","ci":"Nairobi","n":"John","rt":4,"cm":"This is so poor from ando foods yet again not allowing one to rate below four starts such a shame to hide real reviews and feedback.one star"},{"d":"2026-02-02","t":"12:34","o":"157547","rs":"SuperWings, Kilimani","co":"Kenya","ci":"Nairobi","n":"Naisenya Wanjiku","rt":4,"cm":""},{"d":"2026-02-01","t":"23:39","o":"157826","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-02-01","t":"21:15","o":"157578","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Marwan","rt":3,"cm":"Too much salt on the beef burger 😔😔😔"},{"d":"2026-02-01","t":"18:57","o":"158137","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Marvin Gisa","rt":1,"cm":"I did not receive the order yet u telling me to give feedback mxm"},{"d":"2026-02-01","t":"17:40","o":"158549","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Daniel Wachira","rt":5,"cm":""},{"d":"2026-02-01","t":"17:10","o":"158135","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Marvin Gisa","rt":5,"cm":""},{"d":"2026-02-01","t":"14:46","o":"155626","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Bakhita-naomi","rt":5,"cm":""},{"d":"2026-02-01","t":"13:56","o":"138158","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Louis Muia","rt":5,"cm":""},{"d":"2026-01-31","t":"23:13","o":"156998","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mohammed baderaldin","rt":1,"cm":"Is not coming"},{"d":"2026-01-31","t":"22:01","o":"158317","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Louisa","rt":5,"cm":""},{"d":"2026-01-31","t":"18:26","o":"149911","rs":"SuperWings, Westlands","co":"Kenya","ci":"Nairobi","n":"manikumar","rt":5,"cm":""},{"d":"2026-01-31","t":"15:30","o":"147023","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Lucy Kimani","rt":5,"cm":""},{"d":"2026-01-31","t":"12:50","o":"154857","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Joshua","rt":5,"cm":""},{"d":"2026-01-31","t":"11:35","o":"154943","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-01-31","t":"01:08","o":"157732","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Museruka Laika","rt":5,"cm":"Everything is perfect except that my order took two hours to reach me from the time they accepted it, please work on your delivery time"},{"d":"2026-01-30","t":"20:37","o":"157889","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Gabriella","rt":5,"cm":""},{"d":"2026-01-30","t":"20:21","o":"157612","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Josephine","rt":5,"cm":""},{"d":"2026-01-30","t":"19:39","o":"156578","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Uwase","rt":4,"cm":""},{"d":"2026-01-29","t":"20:36","o":"157399","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Dosithe musonera","rt":5,"cm":""},{"d":"2026-01-29","t":"20:25","o":"156994","rs":"Steady pizza chicken house","co":"Rwanda","ci":"Kigali","n":"Marwan","rt":1,"cm":"The pizza is cold and tastless.  I couldn't eat it."},{"d":"2026-01-29","t":"17:01","o":"152689","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Melissa","rt":5,"cm":""},{"d":"2026-01-29","t":"16:49","o":"157506","rs":"Smash Burgers by Ando","co":"Kenya","ci":"Nairobi","n":"Shelsea Liabeta","rt":2,"cm":"The fries are cold"},{"d":"2026-01-29","t":"14:53","o":"154312","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":3,"cm":""},{"d":"2026-01-29","t":"11:07","o":"157232","rs":"Pizza Corner, Since 1989","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-01-29","t":"07:04","o":"157290","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Niyibizi cause lionel","rt":5,"cm":"The best buger ever"},{"d":"2026-01-28","t":"22:34","o":"156244","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"dorcy umutoni","rt":4,"cm":""},{"d":"2026-01-28","t":"16:25","o":"137500","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Natasha Wanjiku","rt":5,"cm":""},{"d":"2026-01-28","t":"14:21","o":"157100","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Willis","rt":5,"cm":""},{"d":"2026-01-28","t":"14:03","o":"130972","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Sheryl Langat","rt":5,"cm":""},{"d":"2026-01-28","t":"12:52","o":"116639","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Silvia","rt":5,"cm":"Very fast and effcient!"},{"d":"2026-01-27","t":"22:09","o":"154371","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Maëva Liz","rt":1,"cm":"My order was not delivered, I dont understand."},{"d":"2026-01-27","t":"21:15","o":"156947","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Paul njonge","rt":5,"cm":""},{"d":"2026-01-27","t":"20:50","o":"156952","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Linah Shikuku","rt":5,"cm":""},{"d":"2026-01-27","t":"18:19","o":"156887","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Marwan","rt":5,"cm":"Good"},{"d":"2026-01-27","t":"14:33","o":"156598","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Lionnel","rt":4,"cm":""},{"d":"2026-01-27","t":"14:09","o":"139125","rs":"Siam Thai Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"elsie chepoghon","rt":5,"cm":""},{"d":"2026-01-27","t":"12:39","o":"154440","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Dusenge","rt":2,"cm":""},{"d":"2026-01-27","t":"00:49","o":"156012","rs":"Kurry Kingdom","co":"Rwanda","ci":"Kigali","n":"Elyse N","rt":5,"cm":"Well, I’m enjoying Ando! I loved how fast they are, and I would rather use it than the green app. Kudos"},{"d":"2026-01-26","t":"23:23","o":"156386","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Nikita","rt":4,"cm":""},{"d":"2026-01-26","t":"21:22","o":"146998","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Umutoni kevine","rt":5,"cm":""},{"d":"2026-01-26","t":"20:59","o":"156618","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Kamikazi Amira","rt":5,"cm":""},{"d":"2026-01-26","t":"18:48","o":"149088","rs":"Lagos Suya Spot, Nigerian Restaurant","co":"Kenya","ci":"Nairobi","n":"Michael","rt":3,"cm":"The stew needs more life. Too expensive for 4 pieces of chicken"},{"d":"2026-01-26","t":"18:31","o":"156285","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Alika Karemera","rt":5,"cm":""},{"d":"2026-01-26","t":"17:45","o":"153191","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Sandy giramata","rt":5,"cm":""},{"d":"2026-01-26","t":"12:07","o":"141525","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Elizabeth Chepkemboi","rt":5,"cm":""},{"d":"2026-01-25","t":"23:25","o":"156240","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"IREBE Asnath","rt":5,"cm":""},{"d":"2026-01-25","t":"23:13","o":"147941","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Nancy Mahoro","rt":5,"cm":"The food was really good😍"},{"d":"2026-01-25","t":"22:36","o":"154475","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"dorcy umutoni","rt":4,"cm":""},{"d":"2026-01-25","t":"21:54","o":"150656","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Sylvie","rt":5,"cm":""},{"d":"2026-01-25","t":"21:43","o":"155979","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Clement","rt":5,"cm":""},{"d":"2026-01-25","t":"19:36","o":"153623","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Auggy","rt":1,"cm":""},{"d":"2026-01-25","t":"18:57","o":"152938","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Kabiru","rt":5,"cm":""},{"d":"2026-01-25","t":"18:11","o":"152211","rs":"Best Nigerian Jollof Restaurant","co":"Rwanda","ci":"Kigali","n":"Hisham","rt":4,"cm":""},{"d":"2026-01-25","t":"17:51","o":"125440","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Sanaa","rt":4,"cm":""},{"d":"2026-01-25","t":"16:55","o":"150277","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Gloria Daisy","rt":5,"cm":""},{"d":"2026-01-25","t":"14:54","o":"154563","rs":"Kurry Kingdom","co":"Rwanda","ci":"Kigali","n":"nawal","rt":4,"cm":"portion size is very small"},{"d":"2026-01-24","t":"22:22","o":"155754","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Inara Carly","rt":4,"cm":""},{"d":"2026-01-24","t":"22:18","o":"155627","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Igabe","rt":5,"cm":""},{"d":"2026-01-24","t":"21:32","o":"151700","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Imran Mohamedali","rt":5,"cm":"Joseph was excellent, kindly share his number for a tip"},{"d":"2026-01-24","t":"16:59","o":"153929","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mohammed baderaldin","rt":5,"cm":""},{"d":"2026-01-24","t":"06:47","o":"154899","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Jude Chege","rt":5,"cm":""},{"d":"2026-01-23","t":"21:00","o":"133547","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Emmanuela Charles","rt":4,"cm":""},{"d":"2026-01-23","t":"15:18","o":"154870","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Cyusa","rt":5,"cm":""},{"d":"2026-01-23","t":"14:04","o":"110864","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nina","rt":5,"cm":""},{"d":"2026-01-23","t":"13:49","o":"153133","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Sylvie","rt":5,"cm":""},{"d":"2026-01-23","t":"12:33","o":"154109","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":"Good experience"},{"d":"2026-01-23","t":"12:03","o":"146000","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Bakhita-naomi","rt":5,"cm":""},{"d":"2026-01-22","t":"21:57","o":"145258","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Pamela Awuor","rt":5,"cm":""},{"d":"2026-01-22","t":"19:20","o":"151583","rs":"Le Djémbe","co":"Kenya","ci":"Nairobi","n":"Mwendwa Matae","rt":1,"cm":"How can a fruit cake cost 450sh and i’m given a dot of a slice…..kindly do better"},{"d":"2026-01-22","t":"16:44","o":"142234","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Josue Igiraneza","rt":4,"cm":""},{"d":"2026-01-22","t":"16:01","o":"153364","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Rawan","rt":5,"cm":""},{"d":"2026-01-22","t":"15:26","o":"145617","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Wangui","rt":5,"cm":"Dominic was kind and professional! 5 star for him….as for the food this is the best thing I have had frim ando kitchens wow! 10/10"},{"d":"2026-01-22","t":"11:05","o":"154451","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Isaac Musoni","rt":4,"cm":""},{"d":"2026-01-22","t":"01:44","o":"133258","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Jasmine","rt":5,"cm":""},{"d":"2026-01-21","t":"22:28","o":"151196","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Urusaro Racheal","rt":5,"cm":""},{"d":"2026-01-21","t":"21:23","o":"147008","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Nyambura","rt":1,"cm":""},{"d":"2026-01-21","t":"19:31","o":"150485","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Boris","rt":4,"cm":""},{"d":"2026-01-21","t":"18:16","o":"154628","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Masabo bertin","rt":5,"cm":""},{"d":"2026-01-21","t":"15:26","o":"154087","rs":"Jungle Grillz","co":"Rwanda","ci":"Kigali","n":"David.M","rt":1,"cm":"They delayed a lot"},{"d":"2026-01-21","t":"14:59","o":"107350","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Aba Gitau","rt":1,"cm":"my bahjia was burnt, i’ve tried calling no one is picking up"},{"d":"2026-01-20","t":"22:13","o":"153105","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"dorcy umutoni","rt":5,"cm":""},{"d":"2026-01-20","t":"20:15","o":"152514","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mohammed baderaldin","rt":3,"cm":"So cold"},{"d":"2026-01-20","t":"16:55","o":"149885","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Charity","rt":5,"cm":""},{"d":"2026-01-20","t":"14:09","o":"146148","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Nyakio M","rt":1,"cm":"I place my order at around 11:45am, order was brought at 3pm and naan was missing. Reached out to cs and no assistance."},{"d":"2026-01-19","t":"18:23","o":"153913","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Mugisha Délice","rt":1,"cm":"The food was cold and not accurate"},{"d":"2026-01-19","t":"18:02","o":"153043","rs":"Mad Burning","co":"Rwanda","ci":"Kigali","n":"Neza Lisa","rt":2,"cm":"Food was cold,few and they had no taste"},{"d":"2026-01-19","t":"15:39","o":"152313","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Yannick Musafiri","rt":5,"cm":""},{"d":"2026-01-19","t":"15:09","o":"148112","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Janet Njeri Mukiri","rt":5,"cm":""},{"d":"2026-01-19","t":"14:23","o":"104898","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Alexandriah G","rt":4,"cm":""},{"d":"2026-01-19","t":"11:03","o":"146485","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Daniel Wachira","rt":5,"cm":"Very well made. Super delicious"},{"d":"2026-01-19","t":"02:54","o":"153903","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Iradukunda Jean pierre","rt":5,"cm":""},{"d":"2026-01-18","t":"21:45","o":"153882","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Kabage Karanja","rt":5,"cm":"Great meal and super dessert. Keep up the consistency."},{"d":"2026-01-18","t":"20:54","o":"138105","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Alvin Muchai","rt":5,"cm":""},{"d":"2026-01-18","t":"19:58","o":"102395","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Ndegwa","rt":4,"cm":""},{"d":"2026-01-18","t":"19:50","o":"153481","rs":"Om EI Dunia, Authentic Arabian Flavors","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-01-18","t":"19:07","o":"148775","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Moaaz elnadi","rt":5,"cm":""},{"d":"2026-01-18","t":"17:59","o":"149275","rs":"Chickiez Fried Chicken Kigali","co":"Rwanda","ci":"Kigali","n":"Gaelle Gatoto","rt":1,"cm":"Nothing was delivered"},{"d":"2026-01-18","t":"17:41","o":"152324","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Jamie","rt":5,"cm":"Quick, delicious and good customer care"},{"d":"2026-01-18","t":"15:47","o":"153479","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-01-18","t":"13:48","o":"141592","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Shema Bruce","rt":5,"cm":""},{"d":"2026-01-18","t":"13:21","o":"149505","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Basma","rt":4,"cm":""},{"d":"2026-01-18","t":"12:30","o":"151529","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Wanjiku Maina","rt":5,"cm":""},{"d":"2026-01-18","t":"01:59","o":"153431","rs":"Steady pizza chicken house","co":"Rwanda","ci":"Kigali","n":"Kai","rt":5,"cm":""},{"d":"2026-01-17","t":"22:30","o":"149140","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Murunga Samita","rt":5,"cm":""},{"d":"2026-01-17","t":"22:05","o":"153478","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Tresor Nkuba","rt":1,"cm":"Order was never received, it seems to be marked as delivered but it was not received on my end."},{"d":"2026-01-17","t":"20:44","o":"153451","rs":"Kurry Kingdom","co":"Rwanda","ci":"Kigali","n":"Vinit","rt":5,"cm":""},{"d":"2026-01-17","t":"20:09","o":"152182","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Benita","rt":5,"cm":""},{"d":"2026-01-17","t":"20:02","o":"153164","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Norbert HAGUMA","rt":4,"cm":"Food was good, but it was not well packaged and the dish spilled on the dished in the bottom"},{"d":"2026-01-17","t":"14:51","o":"149316","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Mike","rt":1,"cm":"I asked for the tacos to not have avocado in them and still it came with"},{"d":"2026-01-17","t":"14:38","o":"152945","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"Sandy giramata","rt":4,"cm":""},{"d":"2026-01-17","t":"14:33","o":"153004","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"BATAMURIZA ISIMBI Sylvie","rt":5,"cm":""},{"d":"2026-01-16","t":"20:32","o":"153051","rs":"Lagos Suya Spot, Nigerian Restaurant","co":"Kenya","ci":"Nairobi","n":"George","rt":3,"cm":"The vegetable in the efo riro seemed a bit over cooked."},{"d":"2026-01-16","t":"18:22","o":"149606","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Sandy giramata","rt":5,"cm":""},{"d":"2026-01-16","t":"17:58","o":"152147","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Iradukunda Jean de Dieu","rt":5,"cm":""},{"d":"2026-01-16","t":"17:49","o":"153157","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Isaro Jessica","rt":5,"cm":""},{"d":"2026-01-16","t":"15:00","o":"151800","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Ron","rt":5,"cm":""},{"d":"2026-01-16","t":"12:41","o":"152199","rs":"Tamu Tamu Dishes","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-01-15","t":"21:46","o":"143910","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Kabiru","rt":5,"cm":""},{"d":"2026-01-15","t":"20:51","o":"152978","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Nelson Nwankwo","rt":5,"cm":"Quick delivery, Good food"},{"d":"2026-01-15","t":"17:43","o":"143321","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Kabiru","rt":5,"cm":""},{"d":"2026-01-15","t":"17:32","o":"152405","rs":"Pot of Jollof","co":"Kenya","ci":"Nairobi","n":"George","rt":5,"cm":""},{"d":"2026-01-15","t":"15:38","o":"150039","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Umulisa Aline","rt":2,"cm":"The order took so long and I ordered breakfast something but you gave me the wrong one bcz there was no eggs just meat"},{"d":"2026-01-15","t":"11:59","o":"152796","rs":"Bibi's Swahili Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Evans Owino Ouma Arianda","rt":5,"cm":""},{"d":"2026-01-14","t":"16:23","o":"124562","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Kimberly","rt":5,"cm":"It was a lil bit spicy but aside from that everything else was perfect 🤏🏾😌"},{"d":"2026-01-14","t":"12:44","o":"152041","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Ketul Dodhia","rt":5,"cm":""},{"d":"2026-01-13","t":"21:54","o":"152497","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Angela Kerubo","rt":5,"cm":""},{"d":"2026-01-13","t":"20:03","o":"150596","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Earl Carter","rt":5,"cm":"10/10"},{"d":"2026-01-13","t":"19:36","o":"146321","rs":"Pot of Jollof","co":"Kenya","ci":"Nairobi","n":"Marie Andati","rt":5,"cm":""},{"d":"2026-01-13","t":"16:17","o":"148005","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Kalimba diana","rt":5,"cm":""},{"d":"2026-01-13","t":"15:32","o":"150403","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-01-13","t":"15:32","o":"151836","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":""},{"d":"2026-01-13","t":"15:03","o":"148599","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Ndungutse","rt":5,"cm":"The time they said it would arrive was accurate which was really good and the driver was absolutely good"},{"d":"2026-01-13","t":"12:51","o":"151531","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Hisham","rt":4,"cm":"The service is top-notch"},{"d":"2026-01-12","t":"22:36","o":"147259","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Sylvie","rt":5,"cm":""},{"d":"2026-01-12","t":"21:32","o":"151604","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Lamih","rt":5,"cm":""},{"d":"2026-01-12","t":"18:38","o":"152036","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Kaliza keva","rt":5,"cm":""},{"d":"2026-01-12","t":"15:00","o":"143881","rs":"Pot of Jollof","co":"Kenya","ci":"Nairobi","n":"Ahmed Omar Bare","rt":1,"cm":"I didn't get my order last night and I will not use the ando app again the rider was very bad and rude and he was n9t polite one"},{"d":"2026-01-12","t":"05:00","o":"150768","rs":"Chickiez Fried Chicken Kigali","co":"Rwanda","ci":"Kigali","n":"Fred Shema","rt":5,"cm":""},{"d":"2026-01-12","t":"00:01","o":"151890","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Ganza Josué","rt":5,"cm":""},{"d":"2026-01-11","t":"18:27","o":"151803","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Selaine Jommo","rt":5,"cm":""},{"d":"2026-01-11","t":"16:30","o":"144294","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Claire Sabina","rt":5,"cm":"Tasty"},{"d":"2026-01-11","t":"16:18","o":"150746","rs":"Tacos Restaurant","co":"Rwanda","ci":"Kigali","n":"Fred Shema","rt":5,"cm":""},{"d":"2026-01-11","t":"13:47","o":"151179","rs":"Pizza Corner, Since 1989","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-01-11","t":"10:59","o":"151445","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Ron","rt":5,"cm":""},{"d":"2026-01-10","t":"18:10","o":"150776","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Jude Chege","rt":5,"cm":""},{"d":"2026-01-10","t":"15:35","o":"146659","rs":"Bloomin Specialty Café","co":"Rwanda","ci":"Kigali","n":"Dylan","rt":5,"cm":""},{"d":"2026-01-10","t":"13:43","o":"147866","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Lulla Mudiay","rt":5,"cm":""},{"d":"2026-01-10","t":"08:45","o":"149841","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Mary","rt":5,"cm":""},{"d":"2026-01-09","t":"20:46","o":"144334","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Betty Mueni","rt":3,"cm":""},{"d":"2026-01-09","t":"20:32","o":"151032","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Pete","rt":1,"cm":"They gave me the wrong order"},{"d":"2026-01-09","t":"15:48","o":"151424","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Auggy","rt":4,"cm":""},{"d":"2026-01-09","t":"11:37","o":"150739","rs":"Nargis Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2026-01-08","t":"17:03","o":"149805","rs":"Chicago The Pizza Place","co":"Kenya","ci":"Nairobi","n":"Fay","rt":1,"cm":""},{"d":"2026-01-08","t":"15:08","o":"151181","rs":"Steady pizza chicken house","co":"Rwanda","ci":"Kigali","n":"Hirwa ucyeye ornella","rt":5,"cm":""},{"d":"2026-01-08","t":"12:44","o":"148159","rs":"Sharon's Zone","co":"Rwanda","ci":"Kigali","n":"Dusenge","rt":1,"cm":""},{"d":"2026-01-07","t":"20:40","o":"150859","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Manzi","rt":5,"cm":""},{"d":"2026-01-07","t":"14:49","o":"142276","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Linda O","rt":1,"cm":"I ordered Tagliatelle w/ Mushroom Cream Sauce the single portion with a single portion of grilled chicken from Little Italy…. I got pad Thai"},{"d":"2026-01-07","t":"10:46","o":"150651","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Mbungiramihigo Chris","rt":1,"cm":""},{"d":"2026-01-06","t":"20:35","o":"129361","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Victor","rt":5,"cm":""},{"d":"2026-01-06","t":"13:27","o":"148369","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Tito","rt":5,"cm":""},{"d":"2026-01-06","t":"12:06","o":"150582","rs":"Tamu Tamu Dishes","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":1,"cm":""},{"d":"2026-01-05","t":"21:53","o":"150812","rs":"Hot Pot Pizzeria","co":"Rwanda","ci":"Kigali","n":"Lamih","rt":1,"cm":""},{"d":"2026-01-05","t":"19:45","o":"150404","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Abatoni Jennifer","rt":5,"cm":".."},{"d":"2026-01-05","t":"18:17","o":"144835","rs":"Pot of Jollof","co":"Kenya","ci":"Nairobi","n":"Jude Chege","rt":5,"cm":""},{"d":"2026-01-05","t":"17:38","o":"133681","rs":"KAI The Sushi Bar, Kilimani","co":"Kenya","ci":"Nairobi","n":"Olivia Naidimwa","rt":4,"cm":""},{"d":"2026-01-05","t":"16:01","o":"150245","rs":"Pizza Corner, Since 1989","co":"Kenya","ci":"Nairobi","n":"George","rt":5,"cm":""},{"d":"2026-01-05","t":"14:03","o":"146694","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Louisa","rt":5,"cm":""},{"d":"2026-01-04","t":"21:24","o":"150642","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Nancy Gashugi","rt":5,"cm":"The food arrived still fresh. The driver was kind, patient and communicative. Seamless experience."},{"d":"2026-01-04","t":"18:10","o":"150455","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Justine Nelson","rt":4,"cm":"Loved the Tomato soup, I felt like the spaghetti needed more but I still enjoyed it!"},{"d":"2026-01-04","t":"15:20","o":"146247","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Sonia Mukuhi Willie","rt":5,"cm":""},{"d":"2026-01-04","t":"14:59","o":"149702","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"MAHORO Geofrey","rt":5,"cm":"Really nice pizzas, loved the delivery service from the rider"},{"d":"2026-01-03","t":"18:34","o":"135474","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Rose","rt":3,"cm":""},{"d":"2026-01-03","t":"10:56","o":"150224","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Muvunyi Umutoni Tania","rt":5,"cm":""},{"d":"2026-01-03","t":"00:18","o":"148769","rs":"SuperWings, Kilimani","co":"Kenya","ci":"Nairobi","n":"Omar salim","rt":5,"cm":""},{"d":"2026-01-02","t":"23:09","o":"142537","rs":"Pizza Freak","co":"Rwanda","ci":"Kigali","n":"Adam bradford","rt":1,"cm":""},{"d":"2026-01-02","t":"19:49","o":"150293","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Patricia Wambui","rt":5,"cm":""},{"d":"2026-01-02","t":"19:27","o":"150281","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Axel","rt":3,"cm":""},{"d":"2026-01-02","t":"15:54","o":"150027","rs":"Marty's Famous Burgers, Kilimani","co":"Kenya","ci":"Nairobi","n":"Solomon","rt":5,"cm":""},{"d":"2026-01-02","t":"13:39","o":"147916","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"Yvette","rt":2,"cm":""},{"d":"2026-01-02","t":"10:20","o":"149591","rs":"Om EI Dunia, Authentic Arabian Flavors","co":"Kenya","ci":"Nairobi","n":"Vineet","rt":5,"cm":""},{"d":"2026-01-01","t":"20:23","o":"117481","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Tamara","rt":4,"cm":""},{"d":"2026-01-01","t":"18:13","o":"144280","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Dennis Williams Mureithi","rt":5,"cm":""},{"d":"2025-12-31","t":"22:49","o":"139155","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Tebby","rt":3,"cm":"pasta was ok but I received a java cookie instead of the cookies in your menu? why?"},{"d":"2025-12-31","t":"22:37","o":"149887","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Uwera Christine","rt":4,"cm":""},{"d":"2025-12-31","t":"18:21","o":"149469","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Watetu","rt":4,"cm":""},{"d":"2025-12-31","t":"14:49","o":"149040","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Abdulkarim Said","rt":5,"cm":""},{"d":"2025-12-31","t":"13:22","o":"145742","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Charity","rt":5,"cm":""},{"d":"2025-12-30","t":"21:36","o":"149675","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Solomon Cyubahiro","rt":4,"cm":"They don't give Ketchapp I thought it was complimentary chips are very little as well otherwise it was amazing"},{"d":"2025-12-30","t":"20:26","o":"148202","rs":"The Perfect Bite","co":"Rwanda","ci":"Kigali","n":"Sandy giramata","rt":5,"cm":""},{"d":"2025-12-30","t":"19:58","o":"130719","rs":"Siam Thai Kitchen, NSK","co":"Kenya","ci":"Nairobi","n":"Carol","rt":1,"cm":"I haven't received the order yet"},{"d":"2025-12-30","t":"18:22","o":"149583","rs":"Charles Burger","co":"Rwanda","ci":"Kigali","n":"Mbungiramihigo Chris","rt":4,"cm":"Was not bad for the first time"},{"d":"2025-12-30","t":"17:58","o":"146766","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Azzam Tamimi","rt":5,"cm":"Delivery took forever! Delivery time needs to be 40 min to 1 hour max. Took too long."},{"d":"2025-12-30","t":"14:16","o":"147345","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Shai RUZIMA","rt":5,"cm":""},{"d":"2025-12-30","t":"00:05","o":"143254","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Vivian Wangechi","rt":3,"cm":""},{"d":"2025-12-29","t":"23:53","o":"148402","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Augustin Gasinzira","rt":5,"cm":""},{"d":"2025-12-29","t":"22:02","o":"149494","rs":"Seaznz Restaurant","co":"Rwanda","ci":"Kigali","n":"Ishimwe Allan","rt":5,"cm":"Best service and thanks to Sady for the help in ordering👌"},{"d":"2025-12-29","t":"18:35","o":"144533","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Watetu","rt":5,"cm":""},{"d":"2025-12-29","t":"17:28","o":"148810","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Mahmud Oloyede","rt":5,"cm":""},{"d":"2025-12-29","t":"15:14","o":"149135","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Nancy Mulwa","rt":4,"cm":"Fantastic portion and arrived hot. Less 1 star as the mushroom fries were a tad bit too salty and the patty tasted soggy/watery. Would rec."},{"d":"2025-12-29","t":"13:55","o":"147216","rs":"KAI The Sushi Bar, Westlands","co":"Kenya","ci":"Nairobi","n":"Nancy Mulwa","rt":5,"cm":""},{"d":"2025-12-29","t":"11:40","o":"149108","rs":"Le Djémbe","co":"Kenya","ci":"Nairobi","n":"George","rt":5,"cm":""},{"d":"2025-12-28","t":"18:48","o":"148989","rs":"Pot of Jollof","co":"Kenya","ci":"Nairobi","n":"George","rt":5,"cm":""},{"d":"2025-12-28","t":"16:22","o":"144710","rs":"Kurry Kingdom","co":"Rwanda","ci":"Kigali","n":"Shaima","rt":5,"cm":""},{"d":"2025-12-28","t":"15:21","o":"144896","rs":"Siam Thai Kitchen, NSK","co":"Kenya","ci":"Nairobi","n":"Mark","rt":4,"cm":""},{"d":"2025-12-28","t":"12:09","o":"146629","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Eva Nyawira","rt":5,"cm":""},{"d":"2025-12-27","t":"22:17","o":"149153","rs":"Hot Pot Pizzeria","co":"Rwanda","ci":"Kigali","n":"Mucyo Elvis","rt":5,"cm":"Order was fast, could've been hotter but good and the bike was nice and friendly. Great experience on my first order"},{"d":"2025-12-27","t":"19:55","o":"148745","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Abdulkarim Said","rt":5,"cm":""},{"d":"2025-12-27","t":"19:23","o":"141052","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Nancy Mulwa","rt":4,"cm":""},{"d":"2025-12-27","t":"15:28","o":"147519","rs":"Meze Fresh","co":"Rwanda","ci":"Kigali","n":"Biluge Richard","rt":3,"cm":"Did not receive what was displayed on the picture for the order, did not meet the all the standards, but what was received is also not bad"},{"d":"2025-12-26","t":"21:03","o":"107332","rs":"KAI The Sushi Bar, Westlands","co":"Kenya","ci":"Nairobi","n":"Chriss","rt":5,"cm":""},{"d":"2025-12-26","t":"16:34","o":"137830","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Doryne M","rt":5,"cm":""},{"d":"2025-12-25","t":"22:33","o":"142921","rs":"Boriska Resto","co":"Rwanda","ci":"Kigali","n":"Latifa UMUTONI","rt":5,"cm":""},{"d":"2025-12-25","t":"21:02","o":"148697","rs":"Best Nigerian Jollof Restaurant","co":"Rwanda","ci":"Kigali","n":"Shema Sady","rt":5,"cm":""},{"d":"2025-12-25","t":"20:14","o":"136113","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Manucho","rt":5,"cm":""},{"d":"2025-12-25","t":"19:24","o":"146203","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Kashif","rt":5,"cm":""},{"d":"2025-12-25","t":"18:50","o":"146540","rs":"Siam Thai Kitchen, NSK","co":"Kenya","ci":"Nairobi","n":"Natasha Lucas","rt":5,"cm":""},{"d":"2025-12-25","t":"17:34","o":"148735","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Abdulkarim Said","rt":4,"cm":""},{"d":"2025-12-25","t":"17:08","o":"142208","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"Asif Khan","rt":5,"cm":""},{"d":"2025-12-25","t":"14:14","o":"123628","rs":"DILLI! - Curries & Grill, Westlands","co":"Kenya","ci":"Nairobi","n":"Sheryl Abwoga","rt":5,"cm":"The food is amazing. This is my first time trying it. LOVE AT FIRST SIGHT!!!. The delivery took 1 and a half hours, which made me sad."},{"d":"2025-12-25","t":"04:58","o":"147199","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"Sandy giramata","rt":5,"cm":""},{"d":"2025-12-24","t":"15:46","o":"143236","rs":"Bibi's Swahili Kitchen, Kilimani","co":"Kenya","ci":"Nairobi","n":"Valerian","rt":5,"cm":""},{"d":"2025-12-23","t":"20:19","o":"144442","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Augustin Gasinzira","rt":5,"cm":""},{"d":"2025-12-23","t":"17:40","o":"148344","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Sifa irakoze","rt":5,"cm":""},{"d":"2025-12-23","t":"17:28","o":"132492","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Nelima Wakhobe","rt":5,"cm":""},{"d":"2025-12-23","t":"16:29","o":"148312","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Gasaro","rt":4,"cm":"It was exactly how l expected it and it was warm just like the way l wanted it,the delivery guy was also friendly"},{"d":"2025-12-23","t":"14:49","o":"148303","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Belinda Ndetei","rt":5,"cm":""},{"d":"2025-12-22","t":"22:15","o":"127545","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Stacey Waithera","rt":5,"cm":""},{"d":"2025-12-22","t":"19:58","o":"136171","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Elsie","rt":5,"cm":""},{"d":"2025-12-22","t":"01:22","o":"146729","rs":"Mozy Pizza & Coffee","co":"Rwanda","ci":"Kigali","n":"Yvette","rt":3,"cm":""},{"d":"2025-12-21","t":"18:55","o":"147591","rs":"Open House Restaurant","co":"Kenya","ci":"Nairobi","n":"George","rt":5,"cm":""},{"d":"2025-12-21","t":"15:53","o":"142091","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Jean Philippe Nezukuri","rt":4,"cm":""},{"d":"2025-12-21","t":"15:51","o":"144320","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Mutethya","rt":5,"cm":""},{"d":"2025-12-20","t":"22:26","o":"147802","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"BATAMURIZA ISIMBI Sylvie","rt":5,"cm":"The delivery was quick and the delivery guy was friendly too...... About food they never disappoint as always"},{"d":"2025-12-20","t":"22:11","o":"147737","rs":"Burger Bros","co":"Rwanda","ci":"Kigali","n":"Sabattinah Tojonirina","rt":5,"cm":""},{"d":"2025-12-20","t":"20:48","o":"147776","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Livia","rt":5,"cm":""},{"d":"2025-12-20","t":"20:32","o":"147736","rs":"EyaMya Restaurant","co":"Rwanda","ci":"Kigali","n":"Sabattinah Tojonirina","rt":4,"cm":"The rider was so friendly, however, the package from the restaurant broke and I couldn't really feel the taste of the food."},{"d":"2025-12-20","t":"20:20","o":"146207","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Selaine Jommo","rt":5,"cm":""},{"d":"2025-12-20","t":"18:09","o":"118286","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"Chantel Airo","rt":5,"cm":""},{"d":"2025-12-20","t":"18:05","o":"145460","rs":"Khan's Pakistani Kitchen, Westlands","co":"Kenya","ci":"Nairobi","n":"Edna Nyambura","rt":5,"cm":""},{"d":"2025-12-20","t":"17:29","o":"147714","rs":"Chickiez Fried Chicken Kigali","co":"Rwanda","ci":"Kigali","n":"Lolio","rt":5,"cm":""},{"d":"2025-12-20","t":"16:53","o":"114602","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Ivy Waiyuyu","rt":5,"cm":"The mother's lasagna always hits the spot and the biscoff cheesecake is a 10/10"},{"d":"2025-12-20","t":"16:51","o":"146331","rs":"Little Italy, NSK","co":"Kenya","ci":"Nairobi","n":"John","rt":5,"cm":""},{"d":"2025-12-20","t":"16:18","o":"146388","rs":"Dontez","co":"Rwanda","ci":"Kigali","n":"Bibi","rt":4,"cm":""},{"d":"2025-12-20","t":"14:48","o":"132825","rs":"Little Italy, Kilimani","co":"Kenya","ci":"Nairobi","n":"Vanessa","rt":5,"cm":""},{"d":"2025-12-20","t":"14:41","o":"130861","rs":"Marty's Famous Burgers, Westlands","co":"Kenya","ci":"Nairobi","n":"Naomi","rt":5,"cm":""}];
+const TODAY = '2026-03-20';
+const PAGE = 50;
+const DCOLS = {1:'#c94035',2:'#e07845',3:'#c9a84c',4:'#72a87e',5:'#3d8c5f'};
+const SCLS  = {1:'s1',2:'s2',3:'s3',4:'s4',5:'s5'};
+
+let fil = [...ALL], pg = 1, gran = 'day', scol = 'date', sdir = 'desc';
+let tlKeys = [], tlVals = [];
+
+const $ = id => document.getElementById(id);
+
+function dMinus(d, n) {
+  const dt = new Date(d+'T00:00:00Z');
+  dt.setUTCDate(dt.getUTCDate()-n);
+  return dt.toISOString().slice(0,10);
+}
+function fmtD(d) {
+  const [y,m,day] = d.split('-');
+  return parseInt(day)+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1];
+}
+function flag(co) { return co==='Kenya'?'🇰🇪':co==='Rwanda'?'🇷🇼':''; }
+function stars(n) {
+  if (!n) return '—';
+  const c = SCLS[n]||'s3';
+  return `<span class="stars"><span class="${c}">${'★'.repeat(n)}</span><span class="se">${'★'.repeat(5-n)}</span></span>`;
+}
+function starsMini(avg) {
+  const c = avg>=4.5?DCOLS[5]:avg>=3.5?DCOLS[4]:avg>=2.5?DCOLS[3]:avg>=1.5?DCOLS[2]:DCOLS[1];
+  const full = Math.round(avg);
+  return `<span style="color:${c};letter-spacing:2px">${'★'.repeat(full)}<span style="color:#e8e8e4">${'★'.repeat(5-full)}</span></span>`;
+}
+function hasF() {
+  return $('fCountry').value || $('fPeriod').value || $('fRest').value || $('fRating').value;
+}
+
+function onCountry() {
+  const co = $('fCountry').value;
+  const sel = $('fRest'), cur = sel.value;
+  while(sel.options.length>1) sel.remove(1);
+  const src = co ? ALL.filter(r=>r.co===co) : ALL;
+  const cnt = {};
+  src.forEach(r => cnt[r.rs]=(cnt[r.rs]||0)+1);
+  Object.entries(cnt).sort((a,b)=>b[1]-a[1]).forEach(([nm])=>{
+    const o = document.createElement('option');
+    o.value = o.textContent = nm;
+    if(nm===cur) o.selected=true;
+    sel.appendChild(o);
+  });
+  applyFilters();
+}
+
+function applyFilters() {
+  const co=$('fCountry').value, pd=parseInt($('fPeriod').value)||0,
+        rs=$('fRest').value, rt=$('fRating').value;
+  const cut = pd>0 ? dMinus(TODAY,pd) : null;
+  fil = ALL.filter(r=>{
+    if(co && r.co!==co) return false;
+    if(cut && r.d<cut) return false;
+    if(rs && r.rs!==rs) return false;
+    if(rt==='5'&&r.rt!==5) return false;
+    if(rt==='low'&&r.rt>2) return false;
+    if(rt==='mid'&&r.rt!==3) return false;
+    if(rt==='high'&&r.rt<4) return false;
+    return true;
+  });
+  pg=1;
+  $('rCount').textContent = fil.length+' reviews';
+  $('btnReset').classList.toggle('on', !!hasF());
+  updKPIs(); rendDist(); rendTimeline(); rendRest(); rendTable();
+}
+
+function resetFilters() {
+  $('fCountry').value=''; $('fPeriod').value=''; $('fRating').value='';
+  onCountry();
+}
+
+function updKPIs() {
+  const t=fil.length;
+  const rts=fil.map(r=>r.rt).filter(x=>x>0);
+  const avg=rts.length?(rts.reduce((a,b)=>a+b,0)/rts.length):0;
+  const five=rts.filter(x=>x===5).length;
+  const fp=t>0?(five/t*100).toFixed(1):'0';
+  const wk=dMinus(TODAY,7), mo=dMinus(TODAY,30);
+  $('kAvg').textContent = avg?avg.toFixed(2):'—';
+  $('kStars').innerHTML = avg?starsMini(avg):'';
+  $('kTotal').textContent = t;
+  $('kFivePct').textContent = fp+'%';
+  $('kFiveSub').textContent = five+' reviews';
+  $('kWeek').textContent = fil.filter(r=>r.d>=wk).length;
+  $('kMonth').textContent = fil.filter(r=>r.d>=mo).length;
+  $('hMeta').textContent = t+' reviews · Dec 2025 – Mar 2026';
+}
+
+function rendDist() {
+  const cnt={1:0,2:0,3:0,4:0,5:0};
+  fil.forEach(r=>{if(r.rt) cnt[r.rt]++;});
+  const mx=Math.max(...Object.values(cnt),1), tot=fil.length||1;
+  let h='';
+  [5,4,3,2,1].forEach(n=>{
+    const c=cnt[n], p=(c/mx*100).toFixed(1), pp=(c/tot*100).toFixed(0);
+    h+=`<div class="dist-row"><div class="dist-label">${n}★</div>
+      <div class="dist-track"><div class="dist-fill f${n}" style="width:${p}%"></div></div>
+      <div class="dist-stats"><strong>${c}</strong> <span>(${pp}%)</span></div></div>`;
+  });
+  $('distChart').innerHTML=h;
+}
+
+function setG(g,btn) {
+  gran=g;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rendTimeline();
+}
+
+function rendTimeline() {
+  const canvas=$('timelineCanvas');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=230;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const grp={};
+  fil.forEach(r=>{
+    let k;
+    if(gran==='day') k=r.d;
+    else if(gran==='week'){
+      const d=new Date(r.d+'T00:00:00Z'), dow=d.getUTCDay()||7;
+      const m=new Date(d); m.setUTCDate(d.getUTCDate()-dow+1);
+      k=m.toISOString().slice(0,10);
+    } else k=r.d.slice(0,7);
+    grp[k]=(grp[k]||0)+1;
+  });
+
+  tlKeys=Object.keys(grp).sort();
+  tlVals=tlKeys.map(k=>grp[k]);
+
+  if(!tlKeys.length){
+    ctx.fillStyle='#ccc'; ctx.font='13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('No data',W/2,H/2); return;
+  }
+
+  const mx=Math.max(...tlVals,1);
+  const pad={t:14,r:14,b:32,l:36};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const step=cw/tlKeys.length;
+  const bw=Math.max(1.5,step-1.5);
+
+  [.25,.5,.75,1].forEach(f=>{
+    const y=pad.t+ch-ch*f;
+    ctx.strokeStyle='#ede9e3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#ccc'; ctx.font='10px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(mx*f),pad.l-5,y+3.5);
+  });
+
+  tlKeys.forEach((k,i)=>{
+    const bh=(tlVals[i]/mx)*ch;
+    const x=pad.l+i*step+(step-bw)/2, y=pad.t+ch-bh;
+    ctx.fillStyle='#C91006'; ctx.globalAlpha=0.72;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x,y,bw,bh,[2,2,0,0]);
+    else ctx.rect(x,y,bw,bh);
+    ctx.fill(); ctx.globalAlpha=1;
+  });
+
+  ctx.fillStyle='#ccc'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+  const ls=Math.max(1,Math.ceil(tlKeys.length/7));
+  tlKeys.forEach((k,i)=>{
+    if(i%ls===0||i===tlKeys.length-1){
+      const x=pad.l+i*step+step/2;
+      ctx.fillText(gran==='month'?k.slice(0,7):k.slice(5),x,H-8);
+    }
+  });
+}
+
+const canvas=$('timelineCanvas');
+canvas.addEventListener('mousemove',function(e){
+  const r=canvas.getBoundingClientRect();
+  const x=e.clientX-r.left;
+  if(!tlKeys.length)return;
+  const pad={l:36,r:14}, cw=canvas.offsetWidth-pad.l-pad.r;
+  const step=cw/tlKeys.length;
+  const i=Math.floor((x-pad.l)/step);
+  if(i<0||i>=tlKeys.length){$('tip').style.display='none';return;}
+  const t=$('tip');
+  t.style.display='block';
+  t.style.left=(e.clientX+14)+'px';
+  t.style.top=(e.clientY-30)+'px';
+  const lbl=gran==='month'?tlKeys[i]:fmtD(tlKeys[i]);
+  t.textContent=lbl+' — '+tlVals[i]+' review'+(tlVals[i]!==1?'s':'');
+});
+canvas.addEventListener('mouseleave',()=>$('tip').style.display='none');
+
+function rendRest() {
+  const cnt={}, sm={}, cos={};
+  fil.forEach(r=>{cnt[r.rs]=(cnt[r.rs]||0)+1;sm[r.rs]=(sm[r.rs]||0)+r.rt;cos[r.rs]=r.co;});
+
+  // Require min 10 reviews, sort by avg rating desc, take top 10
+  const MIN = 10;
+  const srt = Object.entries(cnt)
+    .filter(([,c]) => c >= MIN)
+    .map(([nm,c]) => ({ nm, c, avg: sm[nm]/c }))
+    .sort((a,b) => b.avg - a.avg)
+    .slice(0, 10);
+
+  if (!srt.length) { $('restChart').innerHTML='<div class="no-data">No data</div>'; return; }
+
+  // Bar width = rating out of 5 (so 5.0 = 100%)
+  let h='';
+  srt.forEach(({nm, c, avg}) => {
+    const pct = (avg / 5 * 100).toFixed(1);
+    const f = flag(cos[nm]);
+    // Color bar by rating
+    const barColor = avg >= 4.5 ? '#3d8c5f' : avg >= 3.5 ? '#72a87e' : avg >= 2.5 ? '#c9a84c' : '#c94035';
+    h+=`<div class="rest-row">
+      <div class="rest-name" title="${nm}">${f} ${nm}</div>
+      <div class="rest-track"><div class="rest-fill" style="width:${pct}%;background:${barColor};opacity:0.8"></div></div>
+      <div class="rest-meta">★${avg.toFixed(1)} <span style="color:#ccc">· ${c}</span></div>
+    </div>`;
+  });
+  $('restChart').innerHTML=h;
+}
+
+function sortArr(arr) {
+  return [...arr].sort((a,b)=>{
+    let va,vb;
+    if(scol==='date'){va=a.d+a.t;vb=b.d+b.t;}
+    else if(scol==='rating'){va=a.rt;vb=b.rt;}
+    else if(scol==='restaurant'){va=a.rs;vb=b.rs;}
+    else{va=a.d;vb=b.d;}
+    return sdir==='asc'?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);
+  });
+}
+function setSort(col) {
+  if(scol===col) sdir=sdir==='asc'?'desc':'asc';
+  else{scol=col;sdir=col==='date'?'desc':'asc';}
+  pg=1; rendTable();
+}
+function thCls(col) {
+  let c='srt'; if(scol===col) c+=sdir==='asc'?' asc':' dsc'; return c;
+}
+
+function rendTable() {
+  const srt=sortArr(fil);
+  const s=(pg-1)*PAGE, page=srt.slice(s,s+PAGE);
+  let h=`<table><thead><tr>
+    <th class="${thCls('date')}" onclick="setSort('date')">Date</th>
+    <th>Country</th>
+    <th class="${thCls('restaurant')}" onclick="setSort('restaurant')">Restaurant</th>
+    <th>Customer</th>
+    <th class="${thCls('rating')}" onclick="setSort('rating')">Rating</th>
+    <th>Comment</th>
+  </tr></thead><tbody>`;
+
+  if(!page.length){
+    h+=`<tr><td colspan="6" class="no-data">No reviews match current filters.</td></tr>`;
+  } else {
+    page.forEach(r=>{
+      const f=flag(r.co);
+      const cmt=r.cm?`<span class="cmt">"${r.cm.length>140?r.cm.slice(0,140)+'…':r.cm}"</span>`:`<span class="cmt-empty">—</span>`;
+      h+=`<tr class="${r.rt<=2?'low-row':''}">
+        <td class="date-col">${fmtD(r.d)}</td>
+        <td><span class="flag">${f}</span> ${r.co}</td>
+        <td class="rest-col">${r.rs}</td>
+        <td class="cust-col">${r.n}</td>
+        <td>${stars(r.rt)}</td>
+        <td>${cmt}</td>
+      </tr>`;
+    });
+  }
+  h+='</tbody></table>';
+  $('tBody').innerHTML=h;
+  rendPg();
+}
+
+function rendPg() {
+  const tot=fil.length, tp=Math.ceil(tot/PAGE);
+  if(tp<=1){$('pgTop').innerHTML='';$('pgBot').innerHTML='';return;}
+  const s=(pg-1)*PAGE+1, e=Math.min(pg*PAGE,tot);
+  let info=`<span class="pg-info">${s}–${e} of ${tot}</span>`;
+  let btns=`<button class="pb" onclick="goP(${pg-1})" ${pg===1?'disabled':''}>‹</button>`;
+  const pages=[];
+  for(let i=1;i<=tp;i++){
+    if(i===1||i===tp||Math.abs(i-pg)<=1) pages.push(i);
+    else if(pages[pages.length-1]!=='…') pages.push('…');
+  }
+  pages.forEach(p=>{
+    if(p==='…') btns+=`<span class="pg-dots">…</span>`;
+    else btns+=`<button class="pb ${p===pg?'on':''}" onclick="goP(${p})">${p}</button>`;
+  });
+  btns+=`<button class="pb" onclick="goP(${pg+1})" ${pg===tp?'disabled':''}>›</button>`;
+  const html=`<div class="pg">${info}${btns}</div>`;
+  $('pgTop').innerHTML=html;
+  $('pgBot').innerHTML=html;
+}
+
+function goP(p){
+  const tp=Math.ceil(fil.length/PAGE);
+  if(p<1||p>tp)return;
+  pg=p; rendTable();
+  document.querySelector('.card:last-child').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function init(){
+  onCountry();
+  window.addEventListener('resize',()=>rendTimeline());
+}
+window.addEventListener('load',init);
+</script>
+</body>
+</html>
