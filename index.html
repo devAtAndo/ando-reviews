@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ando — Reviews</title>
+<meta name="description" content="Ando Reviews — manage and monitor your business reviews in one place.">
+<meta name="author" content="Ando Foods">
+<meta name="theme-color" content="#C91006">
+<meta property="og:title" content="Ando — Reviews">
+<meta property="og:description" content="Manage and monitor your business reviews in one place.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="images/ando_logo.svg">
+<script>
+  // Auth guard — redirect to sign-in if not authenticated
+  if (!sessionStorage.getItem('ando_authenticated')) {
+    window.location.href = 'signin.html';
+  }
+</script>
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
 <style>
