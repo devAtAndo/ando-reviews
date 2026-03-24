@@ -1,0 +1,18 @@
+name = "ando-reviews"
+main = "src/worker.js"
+compatibility_date = "2026-03-01"
+account_id = "e0d49a41d12bad45fd0edf901e9844e1"
+
+routes = [
+  { pattern = "reviews.andofoods.co/*", zone_name = "andofoods.co" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ando-reviews"
+database_id = "2bf9de1f-50c4-456f-9d66-595759015d77"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "none"

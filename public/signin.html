@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ando — Sign In</title>
+<meta name="description" content="Sign in to Ando Reviews — manage and monitor your business reviews in one place.">
+<meta name="author" content="Ando Foods">
+<meta name="theme-color" content="#C91006">
+<meta property="og:title" content="Ando — Sign In">
+<meta property="og:description" content="Sign in to Ando Reviews — manage and monitor your business reviews in one place.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="images/ando_logo.svg">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f4f3ef;
+  color: #1a1a1a;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signin-wrapper {
+  width: 100%;
+  max-width: 460px;
+  padding: 20px;
+}
+
+/* Logo */
+.logo-section {
+  text-align: center;
+  margin-bottom: 32px;
+  line-height: 0.5;
+}
+
+.logo-section img {
+  width: 120px;
+  height: auto;
+}
+
+.logo-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #C91006;
+  letter-spacing: 0.3px;
+}
+
+/* Card */
+.signin-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 36px 40px 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.signin-card h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.signin-card .subtitle {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 28px;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  color: #1a1a1a;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.form-group input::placeholder {
+  color: #bbb;
+}
+
+.form-group input:focus {
+  border-color: #C91006;
+  box-shadow: 0 0 0 3px rgba(201, 16, 6, 0.08);
+}
+
+.form-group input.input-error {
+  border-color: #e53935;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #888;
+}
+
+.toggle-password svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Options row */
+.options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  user-select: none;
+}
+
+.remember-me input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid #ccc;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  background: #fff;
+  transition: all 0.15s;
+}
+
+.remember-me input[type="checkbox"]:checked {
+  background: #C91006;
+  border-color: #C91006;
+}
+
+.remember-me input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4.5px;
+  top: 1.5px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #C91006;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #a00d04;
+  text-decoration: underline;
+}
+
+/* Button */
+.signin-btn {
+  width: 100%;
+  padding: 14px;
+  background: #C91006;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.signin-btn:hover {
+  background: #a80d04;
+}
+
+.signin-btn:active {
+  transform: scale(0.99);
+}
+
+.signin-btn:disabled {
+  background: #d4736e;
+  cursor: not-allowed;
+}
+
+/* Error message */
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message.visible {
+  display: flex;
+}
+
+.error-message svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="signin-wrapper">
+  <!-- Logo -->
+  <div class="logo-section">
+    <img src="images/ando_logo.svg" alt="Ando">
+    <div class="logo-subtitle">Reviews</div>
+  </div>
+
+  <!-- Sign-in Card -->
+  <div class="signin-card">
+    <h1>Sign in</h1>
+    <p class="subtitle">Welcome back! Please sign in to continue</p>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7.25 4.75a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zM8 11.5A.75.75 0 118 10a.75.75 0 010 1.5z"/></svg>
+      <span id="errorText">Invalid email or password</span>
+    </div>
+
+    <form id="signinForm" novalidate>
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email address" autocomplete="email" required>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+          <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+            <!-- Eye icon (show) -->
+            <svg id="eyeOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <!-- Eye-off icon (hide) -->
+            <svg id="eyeClosed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+              <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="options-row">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          Remember me
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="signin-btn" id="signinBtn">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<script>
+// Dummy credentials
+const VALID_CREDENTIALS = {
+  email: 'asif.khan@andofoods.co',
+  password: 'Asif@1234!'
+};
+
+// Elements
+const form = document.getElementById('signinForm');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const toggleBtn = document.getElementById('togglePassword');
+const eyeOpen = document.getElementById('eyeOpen');
+const eyeClosed = document.getElementById('eyeClosed');
+const errorMessage = document.getElementById('errorMessage');
+const errorText = document.getElementById('errorText');
+const signinBtn = document.getElementById('signinBtn');
+
+// Toggle password visibility
+toggleBtn.addEventListener('click', () => {
+  const isPassword = passwordInput.type === 'password';
+  passwordInput.type = isPassword ? 'text' : 'password';
+  eyeOpen.style.display = isPassword ? 'none' : 'block';
+  eyeClosed.style.display = isPassword ? 'block' : 'none';
+});
+
+// Clear errors on input
+emailInput.addEventListener('input', clearError);
+passwordInput.addEventListener('input', clearError);
+
+function clearError() {
+  errorMessage.classList.remove('visible');
+  emailInput.classList.remove('input-error');
+  passwordInput.classList.remove('input-error');
+}
+
+function showError(msg) {
+  errorText.textContent = msg;
+  errorMessage.classList.add('visible');
+}
+
+// Form submit
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  clearError();
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  // Validation
+  if (!email) {
+    showError('Please enter your email address');
+    emailInput.classList.add('input-error');
+    emailInput.focus();
+    return;
+  }
+
+  if (!password) {
+    showError('Please enter your password');
+    passwordInput.classList.add('input-error');
+    passwordInput.focus();
+    return;
+  }
+
+  // Simulate loading
+  signinBtn.disabled = true;
+  signinBtn.textContent = 'Signing in...';
+
+  setTimeout(() => {
+    if (email === VALID_CREDENTIALS.email && password === VALID_CREDENTIALS.password) {
+      // Store auth state
+      sessionStorage.setItem('ando_authenticated', 'true');
+      sessionStorage.setItem('ando_user', email);
+
+      // Redirect to main page
+      window.location.href = '/';
+    } else {
+      showError('Invalid email or password. Please try again.');
+      emailInput.classList.add('input-error');
+      passwordInput.classList.add('input-error');
+      signinBtn.disabled = false;
+      signinBtn.textContent = 'Sign in';
+    }
+  }, 800);
+});
+</script>
+
+</body>
+</html>

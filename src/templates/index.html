@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ando — Reviews</title>
+<meta name="description" content="Ando Reviews — manage and monitor your business reviews in one place.">
+<meta name="author" content="Ando Foods">
+<meta name="theme-color" content="#C91006">
+<meta property="og:title" content="Ando — Reviews">
+<meta property="og:description" content="Manage and monitor your business reviews in one place.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="images/ando_logo.svg">
+<script>
+  // Auth guard — redirect to sign-in if not authenticated
+  if (!sessionStorage.getItem('ando_authenticated')) {
+    window.location.href = '/signin';
+  }
+</script>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f8f7f3;
+  color: #1a1a1a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  background: white;
+  border-top: 3px solid #C91006;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+.header-left { display: flex; align-items: baseline; gap: 10px; }
+.header-brand { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.header-divider { width: 1px; height: 14px; background: #e0ddd6; }
+.header-title { font-size: 13px; color: #999; font-weight: 400; }
+.header-meta { font-size: 12px; color: #bbb; }
+
+/* Layout */
+.container { max-width: 1440px; margin: 0 auto; padding: 28px 40px; }
+
+/* KPI */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.kpi {
+  background: white;
+  border-radius: 10px;
+  padding: 18px 22px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04);
+}
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #bbb;
+  margin-bottom: 8px;
+}
+.kpi-value { font-size: 34px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; color: #1a1a1a; }
+.kpi-sub { font-size: 12px; color: #bbb; margin-top: 5px; }
+.kpi.primary { border-left: 3px solid #C91006; padding-left: 19px; }
+.kpi.primary .kpi-value { font-size: 44px; color: #C91006; letter-spacing: -2px; }
+.rating-mini { margin-top: 5px; font-size: 17px; letter-spacing: 2px; }
+
+/* Filters */
+.filters {
+  background: white;
+  border-radius: 10px;
+  padding: 12px 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.fg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 20px;
+  margin-right: 20px;
+  border-right: 1px solid #ede9e3;
+}
+.fg:last-of-type { border-right: none; }
+.fl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #ccc;
+  white-space: nowrap;
+}
+.fs {
+  padding: 6px 24px 6px 10px;
+  border: 1px solid #eae7e0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23bbb'/%3E%3C/svg%3E") no-repeat right 9px center;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 120px;
+}
+.fs:focus { border-color: #C91006; }
+.filter-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.result-count { font-size: 12px; color: #bbb; }
+.btn-reset {
+  font-size: 12px; color: #C91006; background: none; border: none;
+  cursor: pointer; padding: 4px 8px; border-radius: 4px; font-weight: 500;
+  display: none; transition: background 0.15s;
+}
+.btn-reset:hover { background: #fff0ef; }
+.btn-reset.on { display: block; }
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04);
+}
+.card-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #ccc; margin-bottom: 18px;
+}
+
+/* Charts row */
+.charts-row { display: grid; grid-template-columns: 300px 1fr; gap: 14px; margin-bottom: 14px; }
+
+/* Distribution */
+.dist-row { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
+.dist-row:last-child { margin-bottom: 0; }
+.dist-label { width: 22px; font-size: 12px; font-weight: 600; color: #666; text-align: right; flex-shrink: 0; }
+.dist-track { flex: 1; height: 22px; background: #f3f2ee; border-radius: 4px; overflow: hidden; }
+.dist-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.dist-stats { width: 76px; font-size: 12px; color: #bbb; text-align: right; flex-shrink: 0; }
+.dist-stats strong { color: #444; font-weight: 600; }
+.f5 { background: #3d8c5f; } .f4 { background: #72a87e; }
+.f3 { background: #c9a84c; } .f2 { background: #e07845; } .f1 { background: #c94035; }
+
+/* Timeline */
+.timeline-controls { display: flex; gap: 5px; margin-bottom: 14px; }
+.tbtn {
+  padding: 4px 11px; border: 1px solid #e8e6e0; border-radius: 5px;
+  font-size: 12px; cursor: pointer; background: white; color: #888;
+  transition: all 0.12s; font-weight: 500;
+}
+.tbtn.active { background: #1a1a1a; border-color: #1a1a1a; color: white; }
+#timelineCanvas { width: 100%; display: block; cursor: crosshair; }
+.tooltip {
+  position: fixed; background: rgba(20,20,20,0.88); color: white;
+  padding: 6px 11px; border-radius: 6px; font-size: 12px;
+  pointer-events: none; display: none; z-index: 9999; white-space: nowrap;
+}
+
+/* Restaurants */
+.rest-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.rest-row:last-child { margin-bottom: 0; }
+.rest-name { width: 220px; font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.rest-track { flex: 1; height: 12px; background: #f3f2ee; border-radius: 3px; overflow: hidden; }
+.rest-fill { height: 100%; background: #C91006; border-radius: 3px; opacity: 0.65; transition: width 0.4s; }
+.rest-meta { width: 80px; font-size: 11px; color: #aaa; text-align: right; flex-shrink: 0; }
+
+/* Table */
+.table-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.table-hdr .card-title { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 8px 12px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.6px; color: #ccc;
+  border-bottom: 1px solid #ede9e3;
+  white-space: nowrap; user-select: none;
+}
+th.srt { cursor: pointer; }
+th.srt:hover { color: #888; }
+th.asc::after { content: ' ↑'; color: #C91006; }
+th.dsc::after { content: ' ↓'; color: #C91006; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f2ee; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafaf8; }
+tr.low-row td:first-child { border-left: 2px solid #c94035; padding-left: 10px; }
+
+.stars { letter-spacing: 1px; font-size: 13px; }
+.se { color: #e8e8e4; }
+.s1, .s2 { color: #c94035; } .s3 { color: #c9a84c; } .s4 { color: #72a87e; } .s5 { color: #3d8c5f; }
+.date-col { color: #aaa; font-size: 12px; white-space: nowrap; }
+.rest-col { font-weight: 500; }
+.cust-col { color: #666; }
+.cmt { color: #777; font-style: italic; max-width: 300px; }
+.cmt-empty { color: #ddd; }
+.flag { font-size: 13px; }
+
+/* Pagination */
+.pg { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.pg-info { font-size: 12px; color: #bbb; margin-right: 6px; }
+.pb {
+  min-width: 30px; height: 28px; padding: 0 7px; border: 1px solid #e8e6e0;
+  border-radius: 5px; cursor: pointer; background: white; font-size: 12px; color: #666;
+  transition: all 0.12s;
+}
+.pb:hover:not([disabled]) { border-color: #C91006; color: #C91006; }
+.pb.on { background: #C91006; border-color: #C91006; color: white; }
+.pb[disabled] { opacity: 0.3; cursor: default; }
+.pg-dots { font-size: 12px; color: #ccc; padding: 0 3px; }
+.no-data { text-align: center; padding: 48px; color: #ccc; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="tooltip" id="tip"></div>
+
+<header class="header">
+  <div class="header-left">
+    <span class="header-brand">Ando</span>
+    <div class="header-divider"></div>
+    <span class="header-title">Customer Reviews</span>
+  </div>
+  <span class="header-meta" id="hMeta">558 reviews · Dec 2025 – Mar 2026</span>
+</header>
+
+<div class="container">
+
+  <div class="kpi-grid">
+    <div class="kpi primary">
+      <div class="kpi-label">Avg Rating</div>
+      <div class="kpi-value" id="kAvg">4.18</div>
+      <div class="rating-mini" id="kStars"></div>
+      <div class="kpi-sub">out of 5.0</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Reviews</div>
+      <div class="kpi-value" id="kTotal">558</div>
+      <div class="kpi-sub" id="kTotalSub">All time</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">5★ Rate</div>
+      <div class="kpi-value" id="kFivePct">63.8%</div>
+      <div class="kpi-sub" id="kFiveSub">356 reviews</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">This Week</div>
+      <div class="kpi-value" id="kWeek">43</div>
+      <div class="kpi-sub">Last 7 days</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">This Month</div>
+      <div class="kpi-value" id="kMonth">204</div>
+      <div class="kpi-sub">Last 30 days</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="fg">
+      <span class="fl">Country</span>
+      <select class="fs" id="fCountry" onchange="onCountry()">
+        <option value="">All Countries</option>
+        <option value="Kenya">Kenya</option>
+        <option value="Rwanda">Rwanda</option>
+      </select>
+    </div>
+    <div class="fg">
+      <span class="fl">Period</span>
+      <select class="fs" id="fPeriod" onchange="applyFilters()">
+        <option value="">All Time</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+    </div>
+    <div class="fg">
+      <span class="fl">Restaurant</span>
+      <select class="fs" id="fRest" onchange="applyFilters()">
+        <option value="">All Restaurants</option>
+      </select>
+    </div>
+    <div class="fg" style="border-right:none;">
+      <span class="fl">Rating</span>
+      <select class="fs" id="fRating" onchange="applyFilters()">
+        <option value="">All Ratings</option>
+        <option value="5">5★ Only</option>
+        <option value="low">1–2★ Low</option>
+        <option value="mid">3★ Mid</option>
+        <option value="high">4–5★ High</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <span class="result-count" id="rCount">558 reviews</span>
+      <button class="btn-reset" id="btnReset" onclick="resetFilters()">Clear filters ×</button>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">Rating Distribution</div>
+      <div id="distChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Reviews Over Time</div>
+      <div class="timeline-controls">
+        <button class="tbtn active" onclick="setG('day',this)">Day</button>
+        <button class="tbtn" onclick="setG('week',this)">Week</button>
+        <button class="tbtn" onclick="setG('month',this)">Month</button>
+      </div>
+      <canvas id="timelineCanvas"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;">
+      <span class="card-title" style="margin-bottom:0;">Top Restaurants by Rating</span>
+      <span style="font-size:11px;color:#ccc;">min. 10 reviews · bar = avg rating out of 5</span>
+    </div>
+    <div id="restChart"></div>
+  </div>
+
+  <div class="card">
+    <div class="table-hdr">
+      <span class="card-title">All Reviews</span>
+      <div class="pg" id="pgTop"></div>
+    </div>
+    <div id="tBody"></div>
+    <div style="margin-top:16px;display:flex;justify-content:flex-end;" id="pgBot"></div>
+  </div>
+
+</div>
+
+<script>
+const ALL = __REVIEWS_DATA__;
+const TODAY = '__TODAY_DATE__';
+const PAGE = 50;
+const DCOLS = {1:'#c94035',2:'#e07845',3:'#c9a84c',4:'#72a87e',5:'#3d8c5f'};
+const SCLS  = {1:'s1',2:'s2',3:'s3',4:'s4',5:'s5'};
+
+let fil = [...ALL], pg = 1, gran = 'day', scol = 'date', sdir = 'desc';
+let tlKeys = [], tlVals = [];
+
+const $ = id => document.getElementById(id);
+
+function dMinus(d, n) {
+  const dt = new Date(d+'T00:00:00Z');
+  dt.setUTCDate(dt.getUTCDate()-n);
+  return dt.toISOString().slice(0,10);
+}
+function fmtD(d) {
+  const [y,m,day] = d.split('-');
+  return parseInt(day)+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1];
+}
+function flag(co) { return co==='Kenya'?'🇰🇪':co==='Rwanda'?'🇷🇼':''; }
+function stars(n) {
+  if (!n) return '—';
+  const c = SCLS[n]||'s3';
+  return `<span class="stars"><span class="${c}">${'★'.repeat(n)}</span><span class="se">${'★'.repeat(5-n)}</span></span>`;
+}
+function starsMini(avg) {
+  const c = avg>=4.5?DCOLS[5]:avg>=3.5?DCOLS[4]:avg>=2.5?DCOLS[3]:avg>=1.5?DCOLS[2]:DCOLS[1];
+  const full = Math.round(avg);
+  return `<span style="color:${c};letter-spacing:2px">${'★'.repeat(full)}<span style="color:#e8e8e4">${'★'.repeat(5-full)}</span></span>`;
+}
+function hasF() {
+  return $('fCountry').value || $('fPeriod').value || $('fRest').value || $('fRating').value;
+}
+
+function onCountry() {
+  const co = $('fCountry').value;
+  const sel = $('fRest'), cur = sel.value;
+  while(sel.options.length>1) sel.remove(1);
+  const src = co ? ALL.filter(r=>r.co===co) : ALL;
+  const cnt = {};
+  src.forEach(r => cnt[r.rs]=(cnt[r.rs]||0)+1);
+  Object.entries(cnt).sort((a,b)=>b[1]-a[1]).forEach(([nm])=>{
+    const o = document.createElement('option');
+    o.value = o.textContent = nm;
+    if(nm===cur) o.selected=true;
+    sel.appendChild(o);
+  });
+  applyFilters();
+}
+
+function applyFilters() {
+  const co=$('fCountry').value, pd=parseInt($('fPeriod').value)||0,
+        rs=$('fRest').value, rt=$('fRating').value;
+  const cut = pd>0 ? dMinus(TODAY,pd) : null;
+  fil = ALL.filter(r=>{
+    if(co && r.co!==co) return false;
+    if(cut && r.d<cut) return false;
+    if(rs && r.rs!==rs) return false;
+    if(rt==='5'&&r.rt!==5) return false;
+    if(rt==='low'&&r.rt>2) return false;
+    if(rt==='mid'&&r.rt!==3) return false;
+    if(rt==='high'&&r.rt<4) return false;
+    return true;
+  });
+  pg=1;
+  $('rCount').textContent = fil.length+' reviews';
+  $('btnReset').classList.toggle('on', !!hasF());
+  updKPIs(); rendDist(); rendTimeline(); rendRest(); rendTable();
+}
+
+function resetFilters() {
+  $('fCountry').value=''; $('fPeriod').value=''; $('fRating').value='';
+  onCountry();
+}
+
+function updKPIs() {
+  const t=fil.length;
+  const rts=fil.map(r=>r.rt).filter(x=>x>0);
+  const avg=rts.length?(rts.reduce((a,b)=>a+b,0)/rts.length):0;
+  const five=rts.filter(x=>x===5).length;
+  const fp=t>0?(five/t*100).toFixed(1):'0';
+  const wk=dMinus(TODAY,7), mo=dMinus(TODAY,30);
+  $('kAvg').textContent = avg?avg.toFixed(2):'—';
+  $('kStars').innerHTML = avg?starsMini(avg):'';
+  $('kTotal').textContent = t;
+  $('kFivePct').textContent = fp+'%';
+  $('kFiveSub').textContent = five+' reviews';
+  $('kWeek').textContent = fil.filter(r=>r.d>=wk).length;
+  $('kMonth').textContent = fil.filter(r=>r.d>=mo).length;
+  $('hMeta').textContent = t+' reviews · Dec 2025 – Mar 2026';
+}
+
+function rendDist() {
+  const cnt={1:0,2:0,3:0,4:0,5:0};
+  fil.forEach(r=>{if(r.rt) cnt[r.rt]++;});
+  const mx=Math.max(...Object.values(cnt),1), tot=fil.length||1;
+  let h='';
+  [5,4,3,2,1].forEach(n=>{
+    const c=cnt[n], p=(c/mx*100).toFixed(1), pp=(c/tot*100).toFixed(0);
+    h+=`<div class="dist-row"><div class="dist-label">${n}★</div>
+      <div class="dist-track"><div class="dist-fill f${n}" style="width:${p}%"></div></div>
+      <div class="dist-stats"><strong>${c}</strong> <span>(${pp}%)</span></div></div>`;
+  });
+  $('distChart').innerHTML=h;
+}
+
+function setG(g,btn) {
+  gran=g;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rendTimeline();
+}
+
+function rendTimeline() {
+  const canvas=$('timelineCanvas');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth, H=230;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const grp={};
+  fil.forEach(r=>{
+    let k;
+    if(gran==='day') k=r.d;
+    else if(gran==='week'){
+      const d=new Date(r.d+'T00:00:00Z'), dow=d.getUTCDay()||7;
+      const m=new Date(d); m.setUTCDate(d.getUTCDate()-dow+1);
+      k=m.toISOString().slice(0,10);
+    } else k=r.d.slice(0,7);
+    grp[k]=(grp[k]||0)+1;
+  });
+
+  tlKeys=Object.keys(grp).sort();
+  tlVals=tlKeys.map(k=>grp[k]);
+
+  if(!tlKeys.length){
+    ctx.fillStyle='#ccc'; ctx.font='13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('No data',W/2,H/2); return;
+  }
+
+  const mx=Math.max(...tlVals,1);
+  const pad={t:14,r:14,b:32,l:36};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const step=cw/tlKeys.length;
+  const bw=Math.max(1.5,step-1.5);
+
+  [.25,.5,.75,1].forEach(f=>{
+    const y=pad.t+ch-ch*f;
+    ctx.strokeStyle='#ede9e3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+    ctx.fillStyle='#ccc'; ctx.font='10px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(mx*f),pad.l-5,y+3.5);
+  });
+
+  tlKeys.forEach((k,i)=>{
+    const bh=(tlVals[i]/mx)*ch;
+    const x=pad.l+i*step+(step-bw)/2, y=pad.t+ch-bh;
+    ctx.fillStyle='#C91006'; ctx.globalAlpha=0.72;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x,y,bw,bh,[2,2,0,0]);
+    else ctx.rect(x,y,bw,bh);
+    ctx.fill(); ctx.globalAlpha=1;
+  });
+
+  ctx.fillStyle='#ccc'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+  const ls=Math.max(1,Math.ceil(tlKeys.length/7));
+  tlKeys.forEach((k,i)=>{
+    if(i%ls===0||i===tlKeys.length-1){
+      const x=pad.l+i*step+step/2;
+      ctx.fillText(gran==='month'?k.slice(0,7):k.slice(5),x,H-8);
+    }
+  });
+}
+
+const canvas=$('timelineCanvas');
+canvas.addEventListener('mousemove',function(e){
+  const r=canvas.getBoundingClientRect();
+  const x=e.clientX-r.left;
+  if(!tlKeys.length)return;
+  const pad={l:36,r:14}, cw=canvas.offsetWidth-pad.l-pad.r;
+  const step=cw/tlKeys.length;
+  const i=Math.floor((x-pad.l)/step);
+  if(i<0||i>=tlKeys.length){$('tip').style.display='none';return;}
+  const t=$('tip');
+  t.style.display='block';
+  t.style.left=(e.clientX+14)+'px';
+  t.style.top=(e.clientY-30)+'px';
+  const lbl=gran==='month'?tlKeys[i]:fmtD(tlKeys[i]);
+  t.textContent=lbl+' — '+tlVals[i]+' review'+(tlVals[i]!==1?'s':'');
+});
+canvas.addEventListener('mouseleave',()=>$('tip').style.display='none');
+
+function rendRest() {
+  const cnt={}, sm={}, cos={};
+  fil.forEach(r=>{cnt[r.rs]=(cnt[r.rs]||0)+1;sm[r.rs]=(sm[r.rs]||0)+r.rt;cos[r.rs]=r.co;});
+
+  // Require min 10 reviews, sort by avg rating desc, take top 10
+  const MIN = 10;
+  const srt = Object.entries(cnt)
+    .filter(([,c]) => c >= MIN)
+    .map(([nm,c]) => ({ nm, c, avg: sm[nm]/c }))
+    .sort((a,b) => b.avg - a.avg)
+    .slice(0, 10);
+
+  if (!srt.length) { $('restChart').innerHTML='<div class="no-data">No data</div>'; return; }
+
+  // Bar width = rating out of 5 (so 5.0 = 100%)
+  let h='';
+  srt.forEach(({nm, c, avg}) => {
+    const pct = (avg / 5 * 100).toFixed(1);
+    const f = flag(cos[nm]);
+    // Color bar by rating
+    const barColor = avg >= 4.5 ? '#3d8c5f' : avg >= 3.5 ? '#72a87e' : avg >= 2.5 ? '#c9a84c' : '#c94035';
+    h+=`<div class="rest-row">
+      <div class="rest-name" title="${nm}">${f} ${nm}</div>
+      <div class="rest-track"><div class="rest-fill" style="width:${pct}%;background:${barColor};opacity:0.8"></div></div>
+      <div class="rest-meta">★${avg.toFixed(1)} <span style="color:#ccc">· ${c}</span></div>
+    </div>`;
+  });
+  $('restChart').innerHTML=h;
+}
+
+function sortArr(arr) {
+  return [...arr].sort((a,b)=>{
+    let va,vb;
+    if(scol==='date'){va=a.d+a.t;vb=b.d+b.t;}
+    else if(scol==='rating'){va=a.rt;vb=b.rt;}
+    else if(scol==='restaurant'){va=a.rs;vb=b.rs;}
+    else{va=a.d;vb=b.d;}
+    return sdir==='asc'?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);
+  });
+}
+function setSort(col) {
+  if(scol===col) sdir=sdir==='asc'?'desc':'asc';
+  else{scol=col;sdir=col==='date'?'desc':'asc';}
+  pg=1; rendTable();
+}
+function thCls(col) {
+  let c='srt'; if(scol===col) c+=sdir==='asc'?' asc':' dsc'; return c;
+}
+
+function rendTable() {
+  const srt=sortArr(fil);
+  const s=(pg-1)*PAGE, page=srt.slice(s,s+PAGE);
+  let h=`<table><thead><tr>
+    <th class="${thCls('date')}" onclick="setSort('date')">Date</th>
+    <th>Country</th>
+    <th class="${thCls('restaurant')}" onclick="setSort('restaurant')">Restaurant</th>
+    <th>Customer</th>
+    <th class="${thCls('rating')}" onclick="setSort('rating')">Rating</th>
+    <th>Comment</th>
+  </tr></thead><tbody>`;
+
+  if(!page.length){
+    h+=`<tr><td colspan="6" class="no-data">No reviews match current filters.</td></tr>`;
+  } else {
+    page.forEach(r=>{
+      const f=flag(r.co);
+      const cmt=r.cm?`<span class="cmt">"${r.cm.length>140?r.cm.slice(0,140)+'…':r.cm}"</span>`:`<span class="cmt-empty">—</span>`;
+      h+=`<tr class="${r.rt<=2?'low-row':''}">
+        <td class="date-col">${fmtD(r.d)}</td>
+        <td><span class="flag">${f}</span> ${r.co}</td>
+        <td class="rest-col">${r.rs}</td>
+        <td class="cust-col">${r.n}</td>
+        <td>${stars(r.rt)}</td>
+        <td>${cmt}</td>
+      </tr>`;
+    });
+  }
+  h+='</tbody></table>';
+  $('tBody').innerHTML=h;
+  rendPg();
+}
+
+function rendPg() {
+  const tot=fil.length, tp=Math.ceil(tot/PAGE);
+  if(tp<=1){$('pgTop').innerHTML='';$('pgBot').innerHTML='';return;}
+  const s=(pg-1)*PAGE+1, e=Math.min(pg*PAGE,tot);
+  let info=`<span class="pg-info">${s}–${e} of ${tot}</span>`;
+  let btns=`<button class="pb" onclick="goP(${pg-1})" ${pg===1?'disabled':''}>‹</button>`;
+  const pages=[];
+  for(let i=1;i<=tp;i++){
+    if(i===1||i===tp||Math.abs(i-pg)<=1) pages.push(i);
+    else if(pages[pages.length-1]!=='…') pages.push('…');
+  }
+  pages.forEach(p=>{
+    if(p==='…') btns+=`<span class="pg-dots">…</span>`;
+    else btns+=`<button class="pb ${p===pg?'on':''}" onclick="goP(${p})">${p}</button>`;
+  });
+  btns+=`<button class="pb" onclick="goP(${pg+1})" ${pg===tp?'disabled':''}>›</button>`;
+  const html=`<div class="pg">${info}${btns}</div>`;
+  $('pgTop').innerHTML=html;
+  $('pgBot').innerHTML=html;
+}
+
+function goP(p){
+  const tp=Math.ceil(fil.length/PAGE);
+  if(p<1||p>tp)return;
+  pg=p; rendTable();
+  document.querySelector('.card:last-child').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function init(){
+  onCountry();
+  window.addEventListener('resize',()=>rendTimeline());
+}
+window.addEventListener('load',init);
+</script>
+</body>
+</html>
