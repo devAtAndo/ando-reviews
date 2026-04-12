@@ -9,10 +9,47 @@ function getTodayEAT() {
   return `${y}-${m}-${d}`;
 }
 
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
+
+    // Login API endpoint
+    if (path === '/api/login' && request.method === 'POST') {
+      try {
+        const { email, password } = await request.json();
+
+        if (!email || !password) {
+          return Response.json({ success: false, message: 'Email and password are required' }, { status: 400 });
+        }
+
+        const user = await env.DB.prepare(
+          'SELECT email, password_hash, name FROM users WHERE email = ?'
+        ).bind(email.toLowerCase().trim()).first();
+
+        if (!user) {
+          return Response.json({ success: false, message: 'Invalid email or password' }, { status: 401 });
+        }
+
+        const inputHash = await hashPassword(password);
+
+        if (inputHash !== user.password_hash) {
+          return Response.json({ success: false, message: 'Invalid email or password' }, { status: 401 });
+        }
+
+        return Response.json({ success: true, user: { email: user.email, name: user.name } });
+      } catch (err) {
+        return Response.json({ success: false, message: 'Server error' }, { status: 500 });
+      }
+    }
 
     // Serve dashboard with D1 data injected
     if (path === '/' || path === '/index.html' || path === '/index') {

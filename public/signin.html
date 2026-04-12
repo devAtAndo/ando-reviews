@@ -321,12 +321,6 @@ body {
 </div>
 
 <script>
-// Dummy credentials
-const VALID_CREDENTIALS = {
-  email: 'asif.khan@andofoods.co',
-  password: 'Asif@1234!'
-};
-
 // Elements
 const form = document.getElementById('signinForm');
 const emailInput = document.getElementById('email');
@@ -362,14 +356,14 @@ function showError(msg) {
 }
 
 // Form submit
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearError();
 
   const email = emailInput.value.trim();
   const password = passwordInput.value;
 
-  // Validation
+  // Client-side validation
   if (!email) {
     showError('Please enter your email address');
     emailInput.classList.add('input-error');
@@ -384,26 +378,39 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  // Simulate loading
+  // Show loading state
   signinBtn.disabled = true;
   signinBtn.textContent = 'Signing in...';
 
-  setTimeout(() => {
-    if (email === VALID_CREDENTIALS.email && password === VALID_CREDENTIALS.password) {
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
       // Store auth state
       sessionStorage.setItem('ando_authenticated', 'true');
-      sessionStorage.setItem('ando_user', email);
+      sessionStorage.setItem('ando_user', data.user.email);
+      sessionStorage.setItem('ando_user_name', data.user.name);
 
-      // Redirect to main page
+      // Redirect to dashboard
       window.location.href = '/';
     } else {
-      showError('Invalid email or password. Please try again.');
+      showError(data.message || 'Invalid email or password. Please try again.');
       emailInput.classList.add('input-error');
       passwordInput.classList.add('input-error');
       signinBtn.disabled = false;
       signinBtn.textContent = 'Sign in';
     }
-  }, 800);
+  } catch (err) {
+    showError('Something went wrong. Please try again.');
+    signinBtn.disabled = false;
+    signinBtn.textContent = 'Sign in';
+  }
 });
 </script>
 
